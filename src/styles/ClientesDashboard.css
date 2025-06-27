@@ -1,0 +1,115 @@
+/* src/styles/ClientesDashboard.css */
+
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-header h2 {
+  margin: 0;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.dashboard-search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-search input,
+.dashboard-search select {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.dashboard-search button {
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dashboard-search button:hover {
+  background-color: #218838;
+}
+
+.clientes-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.clientes-table th,
+.clientes-table td {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.clientes-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.clientes-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.clientes-table button {
+  margin-right: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.clientes-table button:first-child {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.clientes-table button:first-child:hover {
+  background-color: #e0a800;
+}
+
+.clientes-table button:last-child {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.clientes-table button:last-child:hover {
+  background-color: #c82333;
+}
+
+.text-danger {
+  color: #dc3545;
+  font-weight: bold;
+}
