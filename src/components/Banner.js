@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Box, Typography, Button } from '@mui/material';
+import imageBanner from '../assets/images/image.png';
 
 export default function Banner() {
   return (
@@ -15,42 +16,43 @@ export default function Banner() {
           zIndex: 1,
           clipPath: {
             xs: 'none',
-            md: 'polygon(0 0, 60% 0, 40% 100%, 0 100%)'
-          }
+            md: 'polygon(0 0, 58% 0, 42% 100%, 0 100%)',
+          },
         }}
       >
+        {/* Contenido de texto */}
         <Box
           sx={{
             position: 'absolute',
             top: '50%',
-            left: '5%',
+            left: '6%',
             transform: 'translateY(-50%)',
-            textAlign: 'left', 
             zIndex: 2,
+            color: '#fff',
+            maxWidth: '500px',
           }}
         >
-          <Typography
-            variant="h4"
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Optimizando <br /> Tu Tiempo, Mejorando <br /> Tus Resultados
+          </Typography>
+          <Typography variant="h6" sx={{ fontWeight: 400 }}>
+            Para que cada minuto cuente en tu día a día.
+          </Typography>
+
+          <Button
+            variant="contained"
             sx={{
-              color: 'white',
+              mt: 4,
+              backgroundColor: '#fff',
+              color: '#6d211d',
               fontWeight: 'bold',
-              marginBottom: '20px',
+              '&:hover': {
+                backgroundColor: '#e4e4e4',
+              },
             }}
           >
-            Optimizando <br /> Tu Tiempo Mejorando <br /> Tus Resultados
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              color: 'white',
-              fontWeight: 'bold',
-            }}
-          >
-            para que cada minuto cuente en tu día a día
-          </Typography>
-          <div className="button-container" >
-          <Button variant="contained" color="primary" sx={{ marginTop: '30px' }}>Acceso</Button>
-          </div>
+            Acceso
+          </Button>
         </Box>
       </Box>
       <Box
@@ -61,11 +63,11 @@ export default function Banner() {
           right: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: 'url(/images/alumnos-uteq.png)',
+          backgroundImage: `url(${imageBanner})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: 0,
-          clipPath: 'polygon(60% 0, 100% 0, 100% 100%, 40% 100%)'
+          clipPath: 'polygon(58% 0, 100% 0, 100% 100%, 42% 100%)',
         }}
       />
     </Box>

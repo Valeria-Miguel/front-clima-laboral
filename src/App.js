@@ -7,6 +7,7 @@ import InicioSesion from './pages/InicioSesion';
 import Inicio from './pages/Inicio';
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
+import Empresas from './pages/AgregarEmpresa';
 import './App.css';
 
 const theme = createTheme({
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/inicio-sesion" element={<InicioSesion />} />
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/perfil" element={<Perfil />} />
+                <Route path="/empresas" element={<Empresas />} />
                 </Routes>
             </div>
           </Router>

@@ -40,6 +40,8 @@ export default function Header() {
     navigate('/');
   };
 
+  const mainColor = '#6d211d'; 
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ bgcolor: 'white' }}>
@@ -47,44 +49,68 @@ export default function Header() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <img
               src="/images/g_day-h-16x9.png"
-              alt="DevU Logo"
+              alt="GayGreen Logo"
               style={{ maxHeight: '60px', marginRight: '15px' }}
             />
           </Typography>
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '10px' }}>
-            <Button sx={{ color: '#809BCE' }} onClick={() => handleProtectedNavigation('/calendario')} startIcon={<EventIcon />}>
-              CALENDARIO
-            </Button>
-            <Button sx={{ color: '#809BCE' }} component={Link} to="/actividades" startIcon={<ListAltIcon />}>
-              ACTIVIDADES
-            </Button>
-            <Button sx={{ color: '#809BCE' }} component={Link} to="/reportes" startIcon={<EqualizerIcon />}>
+            <Button
+              sx={{ color: mainColor }}
+              component={Link}
+              to="/reportes"
+              startIcon={<EqualizerIcon sx={{ color: mainColor }} />}
+            >
               REPORTES
             </Button>
-            <Button sx={{ color: '#809BCE' }} component={Link} to="/notificaciones" startIcon={<NotificationsNoneIcon />}>
+            <Button
+              sx={{ color: mainColor }}
+              component={Link}
+              to="/notificaciones"
+              startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
+            >
               NOTIFICACIONES
             </Button>
-            <Button sx={{ color: '#809BCE' }} component={Link} to="/sueno" startIcon={<NightlightRoundIcon />}>
-              HORARIO DE SUEÑO
-            </Button>
-            <Button sx={{ color: '#809BCE' }} component={Link} to="/clases" startIcon={<ClassIcon />}>
-              CLASES
+                        <Button
+              sx={{ color: mainColor }}
+              component={Link}
+              to="/empresas"
+              startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
+            >
+              EMPRESAS
             </Button>
             {user ? (
               <>
-                <Button sx={{ color: '#809BCE' }} onClick={() => handleProtectedNavigation('/perfil')} startIcon={<AccountCircleIcon />}>
+                <Button
+                  sx={{ color: mainColor }}
+                  onClick={() => handleProtectedNavigation('/perfil')}
+                  startIcon={<AccountCircleIcon sx={{ color: mainColor }} />}
+                >
                   PERFIL
                 </Button>
-                <Button sx={{ color: '#809BCE' }} onClick={logout} startIcon={<ExitToAppIcon />}>
+                <Button
+                  sx={{ color: mainColor }}
+                  onClick={logout}
+                  startIcon={<ExitToAppIcon sx={{ color: mainColor }} />}
+                >
                   SALIR
                 </Button>
               </>
             ) : (
               <>
-                <Button sx={{ color: '#809BCE' }} component={Link} to="/acceso" startIcon={<LoginIcon />}>
+                <Button
+                  sx={{ color: mainColor }}
+                  component={Link}
+                  to="/inicio-sesion"
+                  startIcon={<LoginIcon sx={{ color: mainColor }} />}
+                >
                   ACCESO
                 </Button>
-                <Button sx={{ color: '#809BCE' }} component={Link} to="/registro" startIcon={<AppRegistrationIcon />}>
+                <Button
+                  sx={{ color: mainColor }}
+                  component={Link}
+                  to="/registro"
+                  startIcon={<AppRegistrationIcon sx={{ color: mainColor }} />}
+                >
                   REGISTRO
                 </Button>
               </>
@@ -97,7 +123,7 @@ export default function Header() {
             aria-label="menu"
             sx={{
               display: { xs: 'inline', md: 'none' },
-              color: '#809BCE',
+              color: mainColor,
               alignSelf: 'center',
               height: '100%',
             }}
@@ -123,29 +149,56 @@ export default function Header() {
             zIndex: 1300,
           }}
         >
-
-          <Button sx={{ color: '#809BCE' }} component={Link} to="/reportes" startIcon={<EqualizerIcon />}>
+          <Button
+            sx={{ color: mainColor }}
+            component={Link}
+            to="/reportes"
+            startIcon={<EqualizerIcon sx={{ color: mainColor }} />}
+          >
             REPORTES
           </Button>
-          <Button sx={{ color: '#809BCE' }} component={Link} to="/notificaciones" startIcon={<NotificationsNoneIcon />}>
+          <Button
+            sx={{ color: mainColor }}
+            component={Link}
+            to="/notificaciones"
+            startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
+          >
             NOTIFICACIONES
           </Button>
 
           {user ? (
             <>
-              <Button sx={{ color: '#809BCE' }} onClick={() => handleProtectedNavigation('/perfil')} startIcon={<AccountCircleIcon />}>
+              <Button
+                sx={{ color: mainColor }}
+                onClick={() => handleProtectedNavigation('/perfil')}
+                startIcon={<AccountCircleIcon sx={{ color: mainColor }} />}
+              >
                 PERFIL
               </Button>
-              <Button sx={{ color: '#809BCE' }} onClick={logout} startIcon={<ExitToAppIcon />}>
+              <Button
+                sx={{ color: mainColor }}
+                onClick={logout}
+                startIcon={<ExitToAppIcon sx={{ color: mainColor }} />}
+              >
                 SALIR
               </Button>
             </>
           ) : (
             <>
-              <Button sx={{ color: '#809BCE' }} component={Link} to="/acceso" startIcon={<LoginIcon />}>
+              <Button
+                sx={{ color: mainColor }}
+                component={Link}
+                to="/acceso"
+                startIcon={<LoginIcon sx={{ color: mainColor }} />}
+              >
                 ACCESO
               </Button>
-              <Button sx={{ color: '#809BCE' }} component={Link} to="/registro" startIcon={<AppRegistrationIcon />}>
+              <Button
+                sx={{ color: mainColor }}
+                component={Link}
+                to="/registro"
+                startIcon={<AppRegistrationIcon sx={{ color: mainColor }} />}
+              >
                 REGISTRO
               </Button>
             </>

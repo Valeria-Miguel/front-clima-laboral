@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import '../styles/Registro.css';
 
 const Registro = () => {
   const navigate = useNavigate();
@@ -27,11 +28,6 @@ const Registro = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    const nombre = nombreRef.current.value;
-    const app = appRef.current.value;
-    const apm = apmRef.current.value;
-    const telefono = telefonoRef.current.value;
-    const correo = correoRef.current.value;
     const password = passwordRef.current.value;
 
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -46,71 +42,73 @@ const Registro = () => {
       return;
     }
 
-    // Simulación de registro exitoso
     alert('Registro exitoso. Redirigiendo al inicio de sesión...');
     navigate('/inicio-sesion');
   };
 
   return (
-    <div style={{ padding: '40px', backgroundColor: '#f2f2f2', minHeight: '100vh' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>Registro</h2>
-      <div
-        style={{
-          maxWidth: '600px',
-          margin: '0 auto',
-          backgroundColor: '#fff',
-          padding: '20px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          <label>Nombre:</label>
-          <input type="text" ref={nombreRef} required />
+    <>
+      <header className="registro-header">
+        <button
+          onClick={() => navigate(-1)}
+          className="btn-back"
+          aria-label=""
+        >
+          ← 
+        </button>
+        <h1>Registro</h1>
+      </header>
 
-          <label>Apellido paterno:</label>
-          <input type="text" ref={appRef} required />
+      <div className="registro-container">
+        <div className="registro-form-wrapper">
+          <form onSubmit={handleSubmit} className="registro-form">
+            <label>Nombre:</label>
+            <input type="text" ref={nombreRef} required className="registro-input" />
 
-          <label>Apellido materno:</label>
-          <input type="text" ref={apmRef} required />
+            <label>Apellido paterno:</label>
+            <input type="text" ref={appRef} required className="registro-input" />
 
-          <label>Teléfono:</label>
-          <input type="text" ref={telefonoRef} required />
+            <label>Apellido materno:</label>
+            <input type="text" ref={apmRef} required className="registro-input" />
 
-          <label>Correo:</label>
-          <input type="email" ref={correoRef} required />
+            <label>Teléfono:</label>
+            <input type="text" ref={telefonoRef} required className="registro-input" />
 
-          <label>Contraseña:</label>
-          <div style={{ position: 'relative' }}>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              ref={passwordRef}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position: 'absolute',
-                right: '10px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              {showPassword ? 'Ocultar' : 'Mostrar'}
-            </button>
-          </div>
+            <label>Correo:</label>
+            <input type="email" ref={correoRef} required className="registro-input" />
 
-          <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <button type="submit" style={{ marginRight: '10px' }}>Registrar</button>
-            <button type="button" onClick={() => navigate('/inicio-sesion')}>Iniciar sesión</button>
-          </div>
-        </form>
+            <label>Contraseña:</label>
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                ref={passwordRef}
+                required
+                className="registro-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="password-toggle-btn"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
+            </div>
+
+            <div className="form-buttons">
+              <button type="submit" className="btn-primary">Registrar</button>
+              <button
+                type="button"
+                onClick={() => navigate('/inicio-sesion')}
+                className="btn-secondary"
+              >
+                Iniciar sesión
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
