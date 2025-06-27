@@ -39,7 +39,7 @@ const Perfil = () => {
             style={{
               padding: '10px 20px',
               border: 'none',
-              borderRadius: '5px',
+
               backgroundColor: '#1976d2',
               color: '#fff',
               cursor: 'pointer',
