@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import '../styles/Inicio-Sesion.css'; 
+import '../styles/Inicio-Sesion.css';
+
 const InicioSesion = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,6 +32,7 @@ const InicioSesion = () => {
         </button>
         <h1>Inicio de sesión</h1>
       </div>
+
       <div className="registro-container">
         <div className="registro-form-wrapper">
           <form className="registro-form" onSubmit={handleSubmit}>
@@ -63,7 +65,9 @@ const InicioSesion = () => {
               </button>
             </div>
 
-            {error && <p style={{ color: 'red', fontWeight: 'bold' }}>{error}</p>}
+            {error && (
+              <p style={{ color: '#1E40AF', fontWeight: 'bold' }}>{error}</p>
+            )}
 
             <div className="form-buttons">
               <button type="submit" className="btn-primary">Aceptar</button>
@@ -77,14 +81,6 @@ const InicioSesion = () => {
             </div>
 
             <div style={{ marginTop: '18px', textAlign: 'center' }}>
-              <button
-                type="button"
-                className="btn-secondary"
-                style={{ fontSize: '0.95rem', padding: '10px 24px' }}
-                onClick={() => navigate('/recuperarc')}
-              >
-                ¿Olvidaste tu contraseña?
-              </button>
             </div>
           </form>
         </div>

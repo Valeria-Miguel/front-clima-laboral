@@ -12,7 +12,7 @@ export default function Banner() {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: '#6d211d',
+          backgroundColor: '#1E40AF',
           zIndex: 1,
           clipPath: {
             xs: 'none',
@@ -44,7 +44,7 @@ export default function Banner() {
             sx={{
               mt: 4,
               backgroundColor: '#fff',
-              color: '#6d211d',
+              color: '#1E40AF',
               fontWeight: 'bold',
               '&:hover': {
                 backgroundColor: '#e4e4e4',

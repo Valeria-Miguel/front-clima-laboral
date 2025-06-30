@@ -1,7 +1,7 @@
 /* Contenedor principal */
 .registro-empresa-container {
   padding: 40px;
-  background-color: #f5f1f0;
+  background-color: #eff0f0;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -12,10 +12,10 @@
 .registro-empresa-form {
   width: 100%;
   max-width: 650px;
-  background-color: #fff5f5;
+  background-color: #dadada; 
   padding: 30px 35px;
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(139, 0, 0, 0.15);
+  box-shadow: 0 6px 18px rgba(30, 64, 175, 0.15);
 }
 
 /* Etiquetas */
@@ -23,7 +23,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 700;
-  color: #7a0000;
+  color: #1e3a8a; /* azul oscuro */
   font-size: 1rem;
 }
 
@@ -32,7 +32,7 @@
   width: 100%;
   padding: 12px 14px;
   margin-bottom: 22px;
-  border: 2px solid #cc3333;
+  border: 2px solid #3b82f6; /* azul intermedio */
   border-radius: 8px;
   font-size: 1rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -40,9 +40,9 @@
 }
 
 .registro-empresa-input:focus {
-  border-color: #8b0000;
+  border-color: #1E40AF;
   outline: none;
-  box-shadow: 0 0 8px rgba(139, 0, 0, 0.5);
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5);
 }
 
 /* Botones */
@@ -54,7 +54,7 @@
 }
 
 .btn-primary {
-  background-color: #8b0000;
+  background-color: #1E40AF;
   color: white;
   border: none;
   padding: 12px 28px;
@@ -66,13 +66,13 @@
 }
 
 .btn-primary:hover {
-  background-color: #5c0000;
+  background-color: #1e3a8a;
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: #8b0000;
-  border: 2px solid #8b0000;
+  color: #1E40AF;
+  border: 2px solid #1E40AF;
   padding: 12px 28px;
   border-radius: 8px;
   cursor: pointer;
@@ -82,6 +82,6 @@
 }
 
 .btn-secondary:hover {
-  background-color: #8b0000;
+  background-color: #1E40AF;
   color: white;
 }

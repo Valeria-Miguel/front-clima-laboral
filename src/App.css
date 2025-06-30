@@ -125,3 +125,42 @@
     transform: rotate(360deg);
   }
 }
+
+/*-------------------------------*/
+.dashboard-container {
+  padding: 60px 20px;
+  min-height: 80vh;
+  background-color: #f0f8f9;
+  text-align: center;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  color: #1C818D;
+  margin-bottom: 40px;
+  font-weight: 700;
+}
+
+.dashboard-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.dashboard-btn {
+  background-color: #1C818D;
+  color: white;
+  border: none;
+  padding: 16px 30px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  min-width: 220px;
+}
+
+.dashboard-btn:hover {
+  background-color: #166b75;
+}

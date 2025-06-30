@@ -1,15 +1,14 @@
-/* Header superior rojizo */
 .registro-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #8B0000; /* Rojo oscuro */
+  background-color: #1E40AF; 
   color: #fff;
   display: flex;
   align-items: center;
   padding: 12px 20px;
-  box-shadow: 0 2px 6px rgba(139, 0, 0, 0.6);
+  box-shadow: 0 2px 6px rgba(30, 64, 175, 0.6);
   z-index: 1000;
 }
 
@@ -35,34 +34,33 @@
 }
 
 .btn-back:hover {
-  color: #ff4d4d;
+  color: #93c5fd;
 }
 
-/* Contenedor general */
+
 .registro-container {
   padding: 100px 40px 40px 40px;
-  background-color: #f5f1f0;
+  background-color: #dadada;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Formulario */
 .registro-form-wrapper {
   max-width: 500px;
   width: 100%;
-  background-color: #fff5f5;
+  background-color: #ababab;
   padding: 30px 35px;
   border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(139, 0, 0, 0.15);
+  box-shadow: 0 6px 18px rgba(30, 64, 175, 0.15);
 }
 
 .registro-form label {
   display: block;
   margin-bottom: 8px;
   font-weight: 700;
-  color: #7a0000;
+  color: #1e3a8a;
   font-size: 1rem;
 }
 
@@ -70,7 +68,7 @@
   width: 100%;
   padding: 12px 14px;
   margin-bottom: 22px;
-  border: 2px solid #cc3333;
+  border: 2px solid #3b82f6;
   border-radius: 8px;
   font-size: 1rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -78,12 +76,14 @@
 }
 
 .registro-input:focus {
-  border-color: #8b0000;
+  border-color: #1E40AF;
   outline: none;
-  box-shadow: 0 0 8px rgba(139, 0, 0, 0.5);
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5);
 }
-
-/* Password */
+.registro-input::placeholder {
+  color: #6b7280; 
+  opacity: 1; 
+}
 .password-wrapper {
   position: relative;
 }
@@ -95,7 +95,7 @@
   transform: translateY(-50%);
   background: transparent;
   border: none;
-  color: #8b0000;
+  color: #1E40AF;
   font-weight: 700;
   cursor: pointer;
   font-size: 0.95rem;
@@ -103,7 +103,7 @@
 }
 
 .password-toggle-btn:hover {
-  color: #cc0000;
+  color: #2563eb;
 }
 
 /* Botones */
@@ -115,7 +115,7 @@
 }
 
 .btn-primary {
-  background-color: #8b0000;
+  background-color: #1E40AF;
   color: white;
   border: none;
   padding: 14px 34px;
@@ -127,13 +127,13 @@
 }
 
 .btn-primary:hover {
-  background-color: #5c0000;
+  background-color: #1e3a8a;
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: #8b0000;
-  border: 2.5px solid #8b0000;
+  color: #1E40AF;
+  border: 2.5px solid #1E40AF;
   padding: 14px 32px;
   border-radius: 8px;
   cursor: pointer;
@@ -143,6 +143,6 @@
 }
 
 .btn-secondary:hover {
-  background-color: #8b0000;
+  background-color: #1E40AF;
   color: white;
 }

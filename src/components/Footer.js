@@ -27,14 +27,14 @@ function Footer() {
       sx={{
         mt: 'auto',
         backgroundColor: '#f5f1f0', 
-        color: '#6d211d', 
+        color: '#1E40AF', 
         pt: 4,
       }}
     >
       <Container maxWidth="lg">
         <Grid container spacing={4} justifyContent="center">
           <Grid item xs={12} md={4} sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom sx={{ color: '#6d211d' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1E40AF' }}>
               <br />
               <GitHubIcon sx={{ verticalAlign: 'middle', marginRight: 1 }} />
               Developer DatGreen
@@ -56,11 +56,11 @@ function Footer() {
 
 
           <Grid item xs={12} md={4} sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom sx={{ color: '#6d211d' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1E40AF' }}>
               <br />
               Contacto
             </Typography>
-            <Typography variant="body1" sx={{ color: '#6d211d' }}>
+            <Typography variant="body1" sx={{ color: '#1E40AF' }}>
               <EmailIcon sx={{ verticalAlign: 'middle', marginRight: 1 }} />
               Email: contacto@datgreen.com <br />
               <PhoneIcon sx={{ verticalAlign: 'middle', marginRight: 1 }} />
@@ -72,7 +72,7 @@ function Footer() {
 
       <Box
         sx={{
-          backgroundColor: '#6d211d',
+          backgroundColor: '#1E40AF',
           py: 2,
           mt: 4,
         }}
@@ -91,7 +91,7 @@ function Footer() {
           position: 'fixed',
           bottom: 16,
           right: 16,
-          bgcolor: '#6d211d',
+          bgcolor: '#1E40AF',
           color: 'white',
           '&:hover': {
             bgcolor: '#7e2b27',

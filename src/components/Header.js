@@ -40,7 +40,7 @@ export default function Header() {
     navigate('/');
   };
 
-  const mainColor = '#6d211d'; 
+  const mainColor = '#1E40AF'; 
 
   return (
     <Box sx={{ flexGrow: 1 }}>

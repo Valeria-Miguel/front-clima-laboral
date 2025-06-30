@@ -8,6 +8,8 @@ import Inicio from './pages/Inicio';
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
 import Empresas from './pages/AgregarEmpresa';
+import Dashboard from './pages/dashboard';
+import Empleados from './pages/Empleados';
 import './App.css';
 
 const theme = createTheme({
@@ -37,6 +39,8 @@ function App() {
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/perfil" element={<Perfil />} />
                 <Route path="/empresas" element={<Empresas />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/empleados" element={<Empleados />} />
                 </Routes>
             </div>
           </Router>
