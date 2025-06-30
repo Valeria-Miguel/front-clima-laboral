@@ -7,7 +7,7 @@ import InicioSesion from './pages/InicioSesion';
 import Inicio from './pages/Inicio';
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
-import Empresas from './pages/AgregarEmpresa';
+import EmpresasRegistrar from './pages/AgregarEmpresa';
 import ClientesDashboard  from './pages/empresa/ClientesDashboard.js';
 import EditarCliente  from './pages/empresa/EditarCliente.js';
 import './App.css';
@@ -38,9 +38,9 @@ function App() {
                 <Route path="/inicio-sesion" element={<InicioSesion />} />
                 <Route path="/registro" element={<Registro />} />
                 <Route path="/perfil" element={<Perfil />} />
-                <Route path="/empresas" element={<Empresas />} />
+                <Route path="/empresas" element={<EmpresasRegistrar />} />
                 <Route path="/clientes" element={<ClientesDashboard />} />
-                <Route path="/clientes-editar" element={<EditarCliente />} />
+                <Route path="/EditarCliente" element={<EditarCliente />} />
                 </Routes>
             </div>
           </Router>

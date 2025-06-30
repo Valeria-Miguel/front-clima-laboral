@@ -18,13 +18,12 @@ const RegistroEmpresa = () => {
 
   const handleChange = (e) => {
   const { name, value, type } = e.target;
-  setForm(prevForm => ({
-    ...prevForm,
-    [name]: type === 'number' ? (value === '' ? '' : Number(value)) : value
+
+  setForm(prev => ({
+    ...prev,
+    [name]: (type === 'number') ? (value === '' ? '' : Number(value)) : value
   }));
 };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 

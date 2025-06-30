@@ -1,10 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../styles/ClientesDashboard.css';
-
 
 const ClientesDashboard = () => {
   const [clientes, setClientes] = useState([]);
@@ -14,6 +12,7 @@ const ClientesDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchClientes = async () => {
     try {
@@ -21,7 +20,7 @@ const ClientesDashboard = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Error al cargar clientes');
       setClientes(data);
-      setTodosClientes(data); // Guardar copia original
+      setTodosClientes(data);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -62,10 +61,18 @@ const ClientesDashboard = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       alert('Cliente eliminado');
-      fetchClientes(); // Recargar
+      fetchClientes();
     } catch (err) {
       alert('Error al eliminar: ' + err.message);
     }
+  };
+
+  const editarCliente = (cliente) => {
+    navigate('/EditarCliente', { 
+      state: { 
+        clienteData: cliente // Enviamos todos los datos del cliente
+      } 
+    });
   };
 
   useEffect(() => {
@@ -78,7 +85,7 @@ const ClientesDashboard = () => {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <h2>Empresas Registradas</h2>
-          <button className="btn-primary" onClick={() => navigate('/registro-empresa')}>Registrar nueva</button>
+          <button className="btn-primary" onClick={() => navigate('/empresas')}>Registrar nueva</button>
         </div>
 
         <div className="dashboard-search">
@@ -123,7 +130,7 @@ const ClientesDashboard = () => {
                   <td>{cliente.telrespEmpresa}</td>
                   <td>{cliente.emailrespEmpresa}</td>
                   <td>
-                    <button onClick={() => navigate(`/clientes-editar/${cliente._id}`)}>Editar</button>
+                    <button onClick={() => editarCliente(cliente)}>Editar</button>
                     <button onClick={() => eliminarCliente(cliente._id)}>Eliminar</button>
                   </td>
                 </tr>
