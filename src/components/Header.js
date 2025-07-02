@@ -73,7 +73,7 @@ export default function Header() {
                         <Button
               sx={{ color: mainColor }}
               component={Link}
-              to="/empresas"
+              to="/clientes"
               startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
             >
               EMPRESAS
