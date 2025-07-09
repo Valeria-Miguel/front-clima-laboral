@@ -7,15 +7,11 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
-import EventIcon from '@mui/icons-material/Event';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LoginIcon from '@mui/icons-material/Login';
-import ClassIcon from '@mui/icons-material/Class';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import NightlightRoundIcon from '@mui/icons-material/NightlightRound';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 
 export default function Header() {
@@ -65,19 +61,21 @@ export default function Header() {
             <Button
               sx={{ color: mainColor }}
               component={Link}
-              to="/notificaciones"
-              startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
+              to="/dashboard"
+              startIcon={<DashboardIcon sx={{ color: mainColor }} />}
             >
-              NOTIFICACIONES
+              DASHBOARD
+             
             </Button>
-                        <Button
+          {/*
+              <Button
               sx={{ color: mainColor }}
               component={Link}
               to="/clientes"
-              startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
+              startIcon={<DashboardIcon sx={{ color: mainColor }} />}
             >
               EMPRESAS
-            </Button>
+            </Button>*/}
             {user ? (
               <>
                 <Button
@@ -161,7 +159,7 @@ export default function Header() {
             sx={{ color: mainColor }}
             component={Link}
             to="/notificaciones"
-            startIcon={<NotificationsNoneIcon sx={{ color: mainColor }} />}
+            startIcon={<DashboardIcon sx={{ color: mainColor }} />}
           >
             NOTIFICACIONES
           </Button>

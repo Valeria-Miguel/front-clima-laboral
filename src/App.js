@@ -8,10 +8,16 @@ import Inicio from './pages/Inicio';
 import Registro from './pages/Registro';
 import Perfil from './pages/Perfil';
 import Empresas from './pages/AgregarEmpresa';
+import AgregarUsuarios from './pages/AgregarUsuarios.js';
+import AgregarReactivo from './pages/AgregarReactivo.js';
 import Empleados from './pages/Empleados';
 import Dashboard from './pages/dashboard';
 import ClientesDashboard  from './pages/empresa/ClientesDashboard.js';
+import UsuariosDashboard from './pages/usuario/UsuariosDashboard.js';
+import ReactivosDashboard from './pages/reactivos/ReactivosDashboard.js';
 import EditarCliente  from './pages/empresa/EditarCliente.js';
+import EditarUsuario from './pages/usuario/EditarUsuario.js';
+import EditarReactivo from './pages/reactivos/EditarReactivo.js';
 import './App.css';
 
 const theme = createTheme({
@@ -45,6 +51,12 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/clientes" element={<ClientesDashboard />} />
                 <Route path="/EditarCliente" element={<EditarCliente />} />
+                <Route path="/EditarUsuario" element={<EditarUsuario />} />
+                <Route path="/EditarReactivo" element={<EditarReactivo />} />
+                <Route path="/usuarios" element={<UsuariosDashboard />} />
+                <Route path="/preguntas" element={<ReactivosDashboard />} />
+                <Route path="/agregarusuarios" element={<AgregarUsuarios />} />
+                <Route path="/agregarreactivo" element={<AgregarReactivo />} />
                 </Routes>
             </div>
           </Router>

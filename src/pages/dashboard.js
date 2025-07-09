@@ -8,12 +8,12 @@ const DashboardMenu = () => {
   const navigate = useNavigate();
 
   const buttons = [
-    { label: 'Ver Empleados', path: '/empleados' },
+    { label: 'Ver Empleados', path: '/usuarios' },
     { label: 'Ver Clientes', path: '/clientes' },
     { label: 'Análisis', path: '/analisis' },
     { label: 'Cuestionarios', path: '/cuestionarios' },
     { label: 'Preguntas', path: '/preguntas' },
-    { label: 'Registrar Empleado', path: '/registrar-empleado' },
+    { label: 'Registrar Empleado', path: '/agregarusuarios' },
   ];
 
   return (
