@@ -22,6 +22,7 @@ import EditarUsuario from './pages/usuario/EditarUsuario.js';
 import EditarReactivo from './pages/reactivos/EditarReactivo.js';
 import EditarCuestionario from './pages/cuestionarios/EditarCuestionario.js';
 import './App.css';
+import PrivateRoute from './pages/PrivateRoute.js';
 
 const theme = createTheme({
   palette: {
@@ -52,7 +53,10 @@ function App() {
                 <Route path="/empresas" element={<Empresas />} />
                 <Route path="/empleados" element={<Empleados />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/clientes" element={<ClientesDashboard />} />
+               
+                
+                 <Route path="/clientes" element={<PrivateRoute allowedRoles={['administrador']}> <ClientesDashboard /> </PrivateRoute> }   />
+
                 <Route path="/EditarCliente" element={<EditarCliente />} />
                 <Route path="/EditarUsuario" element={<EditarUsuario />} />
                 <Route path="/EditarReactivo" element={<EditarReactivo />} />

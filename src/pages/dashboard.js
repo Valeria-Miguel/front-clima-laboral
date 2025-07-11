@@ -7,8 +7,14 @@ import Header from '../components/Header';
 const DashboardMenu = () => {
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('rol');
+  navigate('/login');
+};
+
   const buttons = [
-    { label: 'Ver Empleados', path: '/usuarios' },
+    { label: 'Ver Empleados CREHCE', path: '/usuarios' },
     { label: 'Ver Clientes', path: '/clientes' },
     { label: 'Análisis', path: '/analisis' },
     { label: 'Cuestionarios', path: '/cuestionarios' },
