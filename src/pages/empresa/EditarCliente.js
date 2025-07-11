@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../styles/RegistroEmpresa.css';
+import ApiConfig from '../../apiConfig';
 
 const EditarCliente = () => {
   const location = useLocation();
@@ -56,7 +57,7 @@ const handleSubmit = async (e) => {
     }
 
     // Asegúrate que la URL sea exactamente como está definida en el backend
-    const response = await fetch('http://localhost:3002/clientes/editar', {
+    const response = await fetch(`${ApiConfig.baseURL}/clientes/editar`, {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',

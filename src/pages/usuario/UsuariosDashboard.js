@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../styles/ClientesDashboard.css';
+import ApiConfig from '../../apiConfig';
 
 const UsuariosDashboard = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -12,10 +13,16 @@ const UsuariosDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
+  const [modalMessage, setModalMessage] = useState('');
+  const [showResultModal, setShowResultModal] = useState(false);
 
   const fetchUsuarios = async () => {
     try {
-      const response = await fetch('http://localhost:3003/usuarios');
+
+      
+      const response = await fetch(`${ApiConfig.baseURL}/usuarios`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Error al cargar usuarios');
       setUsuarios(data);
@@ -49,22 +56,31 @@ const UsuariosDashboard = () => {
     setUsuarios(resultados);
   };
 
-  const eliminarUsuario = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este usuario?')) return;
-    try {
-      const response = await fetch(`http://localhost:3003/usuarios/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || 'Error al eliminar usuario');
-      }
-      alert('Usuario eliminado');
-      fetchUsuarios();
-    } catch (err) {
-      alert('Error al eliminar: ' + err.message);
-    }
-  };
+  
+  const eliminarUsuario = async () => {
+  try {
+    const response = await fetch(`${ApiConfig.baseURL}/usuarios/eliminar`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: userIdToDelete }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error(data.message || 'Error al eliminar usuario');
+
+    setModalMessage('✅ Usuario eliminado correctamente.');
+    setShowResultModal(true);
+    fetchUsuarios();
+  } catch (err) {
+    setModalMessage('❌ ' + err.message);
+    setShowResultModal(true);
+  } finally {
+    setShowConfirmModal(false);
+    setUserIdToDelete(null);
+  }
+};
+
 
   const editarUsuario = (usuario) => {
     navigate('/EditarUsuario', { 
@@ -83,8 +99,8 @@ const UsuariosDashboard = () => {
       <Header />
       <div className="dashboard-container">
         <div className="dashboard-header">
-          <h2>Usuarios Registrados</h2>
-          <button className="btn-primary" onClick={() => navigate('/agregarusuarios')}>Registrar nuevo usuario</button>
+          <h2>Usuarios-Administradores Registrados</h2>
+          <button className="btn-primary" onClick={() => navigate('/agregarusuarios')}>Registrar nuevo administrador</button>
         </div>
 
         <div className="dashboard-search">
@@ -130,7 +146,13 @@ const UsuariosDashboard = () => {
                   <td>{usuario.rol}</td>
                   <td>
                     <button onClick={() => editarUsuario(usuario)}>Editar</button>
-                    <button onClick={() => eliminarUsuario(usuario._id)}>Eliminar</button>
+                    <button onClick={() => {
+                      setUserIdToDelete(usuario._id);
+                      setShowConfirmModal(true);
+                    }}>
+                      Eliminar
+                    </button>
+
                   </td>
                 </tr>
               ))}
@@ -139,6 +161,34 @@ const UsuariosDashboard = () => {
         )}
       </div>
       <Footer />
+      {/* Modal de confirmación */}
+{showConfirmModal && (
+  <div className="modal-overlay">
+    <div className="modal-message">
+      <p>¿Estás seguro de eliminar este usuario?</p>
+      <div className="modal-buttons">
+        <button onClick={eliminarUsuario}>Aceptar</button>
+        <button onClick={() => {
+          setShowConfirmModal(false);
+          setUserIdToDelete(null);
+        }} style={{ backgroundColor: '#ccc', marginLeft: '10px' }}>
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Modal de resultado (éxito o error) */}
+{showResultModal && (
+  <div className="modal-overlay">
+    <div className="modal-message">
+      <p>{modalMessage}</p>
+      <button onClick={() => setShowResultModal(false)}>Cerrar</button>
+    </div>
+  </div>
+)}
+
     </>
   );
 };

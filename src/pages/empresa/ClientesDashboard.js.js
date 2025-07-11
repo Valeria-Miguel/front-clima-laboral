@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../styles/ClientesDashboard.css';
+import ApiConfig from '../../apiConfig';
 
 const ClientesDashboard = () => {
   const [clientes, setClientes] = useState([]);
@@ -13,10 +14,15 @@ const ClientesDashboard = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [clienteToDelete, setClienteToDelete] = useState(null);
+
+  const [modalMessage, setModalMessage] = useState('');
+  const [showResultModal, setShowResultModal] = useState(false);
 
   const fetchClientes = async () => {
     try {
-      const response = await fetch('http://localhost:3002/clientes');
+      const response = await fetch(`${ApiConfig.baseURL}/clientes`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Error al cargar clientes');
       setClientes(data);
@@ -50,22 +56,29 @@ const ClientesDashboard = () => {
     setClientes(resultados);
   };
 
-  const eliminarCliente = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este cliente?')) return;
-    try {
-      const response = await fetch('http://localhost:3002/clientes/eliminar', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
-      alert('Cliente eliminado');
-      fetchClientes();
-    } catch (err) {
-      alert('Error al eliminar: ' + err.message);
-    }
-  };
+  const eliminarCliente = async () => {
+  try {
+    const response = await fetch(`${ApiConfig.baseURL}/clientes/eliminar`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: clienteToDelete._id }),
+
+
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Error al eliminar cliente');
+    setModalMessage('✅ Cliente eliminado correctamente.');
+    setShowResultModal(true);
+    fetchClientes();
+  } catch (err) {
+    setModalMessage('❌ ' + err.message);
+    setShowResultModal(true);
+  } finally {
+    setShowConfirmModal(false);
+    setClienteToDelete(null);
+  }
+};
+
 
   const editarCliente = (cliente) => {
     navigate('/EditarCliente', { 
@@ -131,7 +144,14 @@ const ClientesDashboard = () => {
                   <td>{cliente.emailrespEmpresa}</td>
                   <td>
                     <button onClick={() => editarCliente(cliente)}>Editar</button>
-                    <button onClick={() => eliminarCliente(cliente._id)}>Eliminar</button>
+                    <button onClick={() => {
+                      setClienteToDelete(cliente);
+                      setShowConfirmModal(true);
+                    }}>
+                      Eliminar
+                    </button>
+
+
                   </td>
                 </tr>
               ))}
@@ -140,6 +160,39 @@ const ClientesDashboard = () => {
         )}
       </div>
       <Footer />
+
+      {/* Modal de confirmación */}
+{showConfirmModal && clienteToDelete && (
+  <div className="modal-overlay">
+    <div className="modal-message">
+      <p>¿Estás seguro de eliminar a <strong>{clienteToDelete.nomEmpresa}</strong>?</p>
+
+      <div className="modal-buttons">
+        <button onClick={eliminarCliente}>Aceptar</button>
+        <button
+          onClick={() => {
+            setShowConfirmModal(false);
+            setClienteToDelete(null);
+          }}
+          style={{ backgroundColor: '#ccc', marginLeft: '10px' }}
+        >
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Modal de resultado */}
+{showResultModal && (
+  <div className="modal-overlay">
+    <div className="modal-message">
+      <p>{modalMessage}</p>
+      <button onClick={() => setShowResultModal(false)}>Cerrar</button>
+    </div>
+  </div>
+)}
+
     </>
   );
 };

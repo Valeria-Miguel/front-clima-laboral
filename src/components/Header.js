@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -14,16 +14,28 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 
+export function isTokenExpired(token) {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const now = Math.floor(Date.now() / 1000); // tiempo actual en segundos
+    return payload.exp < now;
+  } catch (error) {
+    return true; // Si no se puede leer el token, lo tratamos como expirado
+  }
+}
+
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const mainColor = '#1E40AF';
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   const handleProtectedNavigation = (path) => {
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    if (isLoggedIn === 'true') {
+    const token = localStorage.getItem('token');
+    if (token) {
       navigate(path);
     } else {
       navigate('/inicio-sesion');
@@ -31,13 +43,42 @@ export default function Header() {
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('rol');
     setUser(null);
-    sessionStorage.clear();
-    navigate('/');
+    navigate('/inicio-sesion');
   };
 
-  const mainColor = '#1E40AF'; 
 
+
+ useEffect(() => {
+  const checkToken = () => {
+    const token = localStorage.getItem('token');
+    const rol = localStorage.getItem('rol');
+
+    if (token && rol) {
+      if (isTokenExpired(token)) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('rol');
+        setUser(null);
+        navigate('/inicio-sesion');
+      } else {
+        setUser({ rol });
+      }
+    } else {
+      setUser(null);
+    }
+  };
+
+  checkToken(); // Verifica inmediatamente al montar
+
+  const interval = setInterval(() => {
+    checkToken(); // Verifica cada 10 segundos
+  }, 10000);
+
+  return () => clearInterval(interval); // Limpia el intervalo al desmontar
+}, [navigate]);
+ 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ bgcolor: 'white' }}>
@@ -49,42 +90,40 @@ export default function Header() {
               style={{ maxHeight: '60px', marginRight: '15px' }}
             />
           </Typography>
+
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '10px' }}>
-            <Button
-              sx={{ color: mainColor }}
-              component={Link}
-              to="/reportes"
-              startIcon={<EqualizerIcon sx={{ color: mainColor }} />}
-            >
-              REPORTES
-            </Button>
-            <Button
-              sx={{ color: mainColor }}
-              component={Link}
-              to="/dashboard"
-              startIcon={<DashboardIcon sx={{ color: mainColor }} />}
-            >
-              DASHBOARD
-             
-            </Button>
-          {/*
-              <Button
-              sx={{ color: mainColor }}
-              component={Link}
-              to="/clientes"
-              startIcon={<DashboardIcon sx={{ color: mainColor }} />}
-            >
-              EMPRESAS
-            </Button>*/}
-            {user ? (
+            {user && user.rol === 'administrador' && (
               <>
                 <Button
                   sx={{ color: mainColor }}
-                  onClick={() => handleProtectedNavigation('/perfil')}
-                  startIcon={<AccountCircleIcon sx={{ color: mainColor }} />}
+                  component={Link}
+                  to="/reportes"
+                  startIcon={<EqualizerIcon sx={{ color: mainColor }} />}
                 >
-                  PERFIL
+                  REPORTES
                 </Button>
+                <Button
+                  sx={{ color: mainColor }}
+                  component={Link}
+                  to="/dashboard"
+                  startIcon={<DashboardIcon sx={{ color: mainColor }} />}
+                >
+                  DASHBOARD
+                </Button>
+              </>
+            )}
+
+            {user ? (
+              <>
+                {user.rol === 'administrador' && (
+                  <Button
+                    sx={{ color: mainColor }}
+                    onClick={() => handleProtectedNavigation('/perfil')}
+                    startIcon={<AccountCircleIcon sx={{ color: mainColor }} />}
+                  >
+                    PERFIL
+                  </Button>
+                )}
                 <Button
                   sx={{ color: mainColor }}
                   onClick={logout}
@@ -114,6 +153,7 @@ export default function Header() {
               </>
             )}
           </Box>
+
           <IconButton
             size="large"
             edge="end"
@@ -132,6 +172,7 @@ export default function Header() {
         </Toolbar>
       </AppBar>
 
+      {/* Menú desplegable móvil */}
       {menuOpen && (
         <Box
           sx={{
@@ -147,32 +188,38 @@ export default function Header() {
             zIndex: 1300,
           }}
         >
-          <Button
-            sx={{ color: mainColor }}
-            component={Link}
-            to="/reportes"
-            startIcon={<EqualizerIcon sx={{ color: mainColor }} />}
-          >
-            REPORTES
-          </Button>
-          <Button
-            sx={{ color: mainColor }}
-            component={Link}
-            to="/notificaciones"
-            startIcon={<DashboardIcon sx={{ color: mainColor }} />}
-          >
-            NOTIFICACIONES
-          </Button>
-
-          {user ? (
+          {user && user.rol === 'administrador' && (
             <>
               <Button
                 sx={{ color: mainColor }}
-                onClick={() => handleProtectedNavigation('/perfil')}
-                startIcon={<AccountCircleIcon sx={{ color: mainColor }} />}
+                component={Link}
+                to="/reportes"
+                startIcon={<EqualizerIcon sx={{ color: mainColor }} />}
               >
-                PERFIL
+                REPORTES
               </Button>
+              <Button
+                sx={{ color: mainColor }}
+                component={Link}
+                to="/dashboard"
+                startIcon={<DashboardIcon sx={{ color: mainColor }} />}
+              >
+                DASHBOARD
+              </Button>
+            </>
+          )}
+
+          {user ? (
+            <>
+              {user.rol === 'administrador' && (
+                <Button
+                  sx={{ color: mainColor }}
+                  onClick={() => handleProtectedNavigation('/perfil')}
+                  startIcon={<AccountCircleIcon sx={{ color: mainColor }} />}
+                >
+                  PERFIL
+                </Button>
+              )}
               <Button
                 sx={{ color: mainColor }}
                 onClick={logout}
@@ -186,7 +233,7 @@ export default function Header() {
               <Button
                 sx={{ color: mainColor }}
                 component={Link}
-                to="/acceso"
+                to="/inicio-sesion"
                 startIcon={<LoginIcon sx={{ color: mainColor }} />}
               >
                 ACCESO

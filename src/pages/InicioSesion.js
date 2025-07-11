@@ -10,6 +10,8 @@ const InicioSesion = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [showModalError, setShowModalError] = useState(false);
+  const [modalErrorMessage, setModalErrorMessage] = useState('');
 
   const handleSubmit = async (event) => {
   event.preventDefault();
@@ -31,7 +33,8 @@ const InicioSesion = () => {
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.error || 'Error en el login');
+      setModalErrorMessage(data.message || 'Error en el login');
+      setShowModalError(true);
       return;
     }
 
@@ -51,9 +54,11 @@ const InicioSesion = () => {
     }
 
 
-  } catch (err) {
-    setError('Error de conexión con el servidor');
+    } catch (err) {
+    setModalErrorMessage('Error de conexión con el servidor');
+    setShowModalError(true);
   }
+
 };
 
 
@@ -63,6 +68,9 @@ const InicioSesion = () => {
         <button className="btn-back" onClick={() => navigate(-1)}>
           <ArrowBackIcon style={{ verticalAlign: 'middle', marginRight: '6px' }} />
           Volver
+        </button>
+        <button className="btn-back" onClick={() => navigate('/')}>
+          Inicio
         </button>
         <h1>Inicio de sesión</h1>
       </div>
@@ -119,8 +127,46 @@ const InicioSesion = () => {
           </form>
         </div>
       </div>
+        return (
+    <>
+      <div className="registro-header">
+        {/* ...tu código actual... */}
+      </div>
+
+      <div className="registro-container">
+        <div className="registro-form-wrapper">
+          {/* ...formulario... */}
+        </div>
+      </div>
+
+      {/* Aquí agregas el modal */}
+      {showModalError && (
+        <div className="modal-overlay">
+          <div className="modal-message">
+            <p>{modalErrorMessage}</p>
+            <div className="modal-buttons">
+              <button
+                onClick={() => {
+                  setShowModalError(false);
+                  setEmail('');
+                  setPassword('');
+                  setError('');
+                }}
+              >
+                Aceptar
+              </button>
+              
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
+    </>
+    
+  );
 };
+
+
 
 export default InicioSesion;
