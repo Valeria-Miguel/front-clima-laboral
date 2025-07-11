@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import '../styles/Inicio-Sesion.css';
+import ApiConfig from '../apiConfig';
 
 const InicioSesion = () => {
   const [email, setEmail] = useState('');
@@ -10,18 +11,51 @@ const InicioSesion = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = async (event) => {
+  event.preventDefault();
 
-    if (!email || !password) {
-      setError('Por favor, completa todos los campos.');
+  if (!email || !password) {
+    setError('Por favor, completa todos los campos.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${ApiConfig.baseURL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ correo: email, contrasena: password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.error || 'Error en el login');
       return;
     }
 
-    alert(`Inicio de sesión simulado con:\nCorreo: ${email}`);
-    sessionStorage.setItem('isLoggedIn', 'true');
-    navigate('/');
-  };
+    // Guardar token y rol en localStorage
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('rol', data.rol);
+
+    // Redirigir según rol
+    if (data.rol === 'cliente') {
+      navigate('/cliente');
+    } else if (data.rol === 'empleado' || data.rol === 'empleado_cliente') {
+      navigate('/empleado');
+    } else if (data.rol === 'administrador') {
+      navigate('/dashboard');
+    } else {
+      navigate('/'); // ruta por defecto o "no autorizado"
+    }
+
+
+  } catch (err) {
+    setError('Error de conexión con el servidor');
+  }
+};
+
 
   return (
     <>
