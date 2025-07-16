@@ -24,6 +24,24 @@ import AgregarEmpleado from './pages/empleados_cli/AgregarEmpleados.js';
 import './App.css';
 import PrivateRoute from './pages/PrivateRoute.js';
 import EmpleadosEmpresa from './pages/empleados_cli/EmpleadosEmpresa.js';
+import RegistroDimension from './pages/RegistroDimension';
+import RegistroEscala from './pages/RegistroEscala';
+import DimensionesDashboard from './pages/reactivos/DimensionesDashboard.js';
+import EscalasDashboard from './pages/reactivos/EscalasDashboard.js';
+import EditarDimension from './pages/reactivos/EditarDimension.js';
+import EditarEscala from './pages/reactivos/EditarEscala.js';
+
+
+import CuestionariosDashboard from './pages/CuestionariosDashboard.js';
+import RegistroCuestionario from './pages/RegistroCuestionario.js';
+import EditarCuestionario from './pages/EditarCuestionario.js';
+
+import SeccionesDashboard from './pages/SeccionesDashboard.js';
+import RegistroSeccion from './pages/RegistroSeccion.js';
+import EditarSeccion from './pages/EditarSeccion.js';
+import inicio_clientes from './pages/inicio_clientes.js';
+import inicio_empleado from './pages/inicio_empleado.js';
+
 
 const theme = createTheme({
   palette: {
@@ -62,6 +80,34 @@ function App() {
                  <Route path="/AgregarEmpleado" element={<PrivateRoute allowedRoles={['administrador']}> <AgregarEmpleado /> </PrivateRoute> }   />
 
                 <Route path="/empresa-empleados" element={<EmpleadosEmpresa />} />
+
+
+
+
+{/* Escalas */}
+  <Route path="/escalas" element={<EscalasDashboard />} />
+  <Route path="/registro-escala" element={<RegistroEscala />} />
+  <Route path="/editar-escala" element={<EditarEscala />} />
+
+  {/* Dimensiones */}
+  <Route path="/dimensiones" element={<DimensionesDashboard />} />
+  <Route path="/registro-dimension" element={<RegistroDimension />} />
+  <Route path="/editar-dimension" element={<EditarDimension />} />
+
+
+    {/* Rutas de Cuestionarios */}
+    <Route path="/cuestionarios" element={<CuestionariosDashboard />} />
+    <Route path="/registro-cuestionario" element={<RegistroCuestionario />} />
+    <Route path="/editar-cuestionario" element={<EditarCuestionario />} />
+
+    {/* Rutas de Secciones */}
+    <Route path="/secciones/:cuestionarioId" element={<SeccionesDashboard />} />
+    <Route path="/registro-seccion" element={<RegistroSeccion />} />
+    <Route path="/editar-seccion" element={<EditarSeccion />} />
+<Route path="/inicio_clientes" element={<inicio_clientes />} />
+    <Route path="/inicio_empleado" element={<inicio_empleado />} />
+
+
 
                 <Route path="/EditarCliente" element={<EditarCliente />} />
                 <Route path="/EditarUsuario" element={<EditarUsuario />} />

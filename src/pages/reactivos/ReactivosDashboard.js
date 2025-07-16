@@ -92,6 +92,12 @@ const PreguntasDashboard = () => {
           <button className="btn-primary" onClick={() => navigate('/agregarreactivo')}>
             Registrar nueva pregunta
           </button>
+            <button type="button" className="btn-primary" onClick={() => navigate('/dimensiones')}>
+            ➕ Agregar Dimensión
+          </button>
+          <button type="button" className="btn-primary ml-2" onClick={() => navigate('/escalas')}>
+            ➕ Agregar Escala
+          </button>
         </div>
 
         <div className="dashboard-search">

@@ -44,9 +44,9 @@ const InicioSesion = () => {
 
     // Redirigir según rol
     if (data.rol === 'cliente') {
-      navigate('/cliente');
+      navigate('/inicio_cliente');
     } else if (data.rol === 'empleado' || data.rol === 'empleado_cliente') {
-      navigate('/empleado');
+      navigate('/inicio_empleado');
     } else if (data.rol === 'administrador') {
       navigate('/dashboard');
     } else {
