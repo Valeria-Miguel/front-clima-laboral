@@ -21,7 +21,7 @@ import EditarReactivo from './pages/reactivos/EditarReactivo.js';
 import EmpledosDashboard from './pages/empleados_cli/EmpleadosDashboard.js';
 import EditarEmpleado from './pages/empleados_cli/EditarEmpleados.js';
 import AgregarEmpleado from './pages/empleados_cli/AgregarEmpleados.js';
-import './App.css';
+
 import PrivateRoute from './pages/PrivateRoute.js';
 import EmpleadosEmpresa from './pages/empleados_cli/EmpleadosEmpresa.js';
 import RegistroDimension from './pages/RegistroDimension';
@@ -43,6 +43,7 @@ import InicioClientes from './pages/inicio_clientes.js';
 import InicioEmpleado from './pages/inicio_empleado.js';
 import FormularioCliente from './pages/formulario/formulario.js';
 
+import './App.css';
 
 const theme = createTheme({
   palette: {
