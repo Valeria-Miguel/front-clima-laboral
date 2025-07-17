@@ -8,12 +8,14 @@ const BienvenidaEmpleado = () => {
   const [codigo, setCodigo] = useState('');
   const navigate = useNavigate();
 
+  // QUITA EL CODIGO DEL FOMULARIO DESPUES SE INSTEGRA 
   const manejarRespuesta = () => {
     if (!codigo.trim()) {
       alert('Por favor, ingresa un código válido');
       return;
     }
-    navigate(`/formulario/${codigo}`);
+    //navigate(`/formulario/${codigo}`);
+    navigate('/formulario'); 
   };
 
   return (

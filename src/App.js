@@ -12,10 +12,10 @@ import AgregarUsuarios from './pages/usuario/AgregarUsuarios.js';
 import AgregarReactivo from './pages/AgregarReactivo.js';
 import Empleados from './pages/Empleados';
 import Dashboard from './pages/dashboard';
-import ClientesDashboard  from './pages/empresa/ClientesDashboard.js';
+import ClientesDashboard from './pages/empresa/ClientesDashboard.js';
 import UsuariosDashboard from './pages/usuario/UsuariosDashboard.js';
 import ReactivosDashboard from './pages/reactivos/ReactivosDashboard.js';
-import EditarCliente  from './pages/empresa/EditarCliente.js';
+import EditarCliente from './pages/empresa/EditarCliente.js';
 import EditarUsuario from './pages/usuario/EditarUsuario.js';
 import EditarReactivo from './pages/reactivos/EditarReactivo.js';
 import EmpledosDashboard from './pages/empleados_cli/EmpleadosDashboard.js';
@@ -39,8 +39,9 @@ import EditarCuestionario from './pages/EditarCuestionario.js';
 import SeccionesDashboard from './pages/SeccionesDashboard.js';
 import RegistroSeccion from './pages/RegistroSeccion.js';
 import EditarSeccion from './pages/EditarSeccion.js';
-import inicio_clientes from './pages/inicio_clientes.js';
-import inicio_empleado from './pages/inicio_empleado.js';
+import InicioClientes from './pages/inicio_clientes.js';
+import InicioEmpleado from './pages/inicio_empleado.js';
+import FormularioCliente from './pages/formulario/formulario.js';
 
 
 const theme = createTheme({
@@ -68,44 +69,49 @@ function App() {
                 <Route path="/" element={<Inicio />} />
                 <Route path="/inicio-sesion" element={<InicioSesion />} />
                 <Route path="/registro" element={<Registro />} />
-               
-                <Route path="/perfil" element={<PrivateRoute allowedRoles={['administrador']}> <Perfil /> </PrivateRoute> }   />
-                <Route path="/empresas" element={<PrivateRoute allowedRoles={['administrador']}> <Empresas /> </PrivateRoute> }   />
-                <Route path="/empleados" element={<PrivateRoute allowedRoles={['administrador']}> <Empleados /> </PrivateRoute> }   />
-                <Route path="/dashboard" element={<PrivateRoute allowedRoles={['administrador']}> <Dashboard /> </PrivateRoute> }   />
-                 <Route path="/clientes" element={<PrivateRoute allowedRoles={['administrador']}> <ClientesDashboard /> </PrivateRoute> }   />
 
-                <Route path="/EditarEmpleado" element={<PrivateRoute allowedRoles={['administrador']}> <EditarEmpleado /> </PrivateRoute> }   />
-                <Route path="/Empleados-dashboard" element={<PrivateRoute allowedRoles={['administrador']}> <EmpledosDashboard /> </PrivateRoute> }   />
-                 <Route path="/AgregarEmpleado" element={<PrivateRoute allowedRoles={['administrador']}> <AgregarEmpleado /> </PrivateRoute> }   />
+                <Route path="/perfil" element={<PrivateRoute allowedRoles={['administrador']}> <Perfil /> </PrivateRoute>} />
+                <Route path="/empresas" element={<PrivateRoute allowedRoles={['administrador']}> <Empresas /> </PrivateRoute>} />
+                <Route path="/empleados" element={<PrivateRoute allowedRoles={['administrador']}> <Empleados /> </PrivateRoute>} />
+                <Route path="/dashboard" element={<PrivateRoute allowedRoles={['administrador']}> <Dashboard /> </PrivateRoute>} />
+                <Route path="/clientes" element={<PrivateRoute allowedRoles={['administrador']}> <ClientesDashboard /> </PrivateRoute>} />
+
+                <Route path="/EditarEmpleado" element={<PrivateRoute allowedRoles={['administrador']}> <EditarEmpleado /> </PrivateRoute>} />
+                <Route path="/Empleados-dashboard" element={<PrivateRoute allowedRoles={['administrador']}> <EmpledosDashboard /> </PrivateRoute>} />
+                <Route path="/AgregarEmpleado" element={<PrivateRoute allowedRoles={['administrador']}> <AgregarEmpleado /> </PrivateRoute>} />
 
                 <Route path="/empresa-empleados" element={<EmpleadosEmpresa />} />
 
+                <Route path="/inicio_cliente" element={<InicioClientes />} />
+                <Route path="/inicio_empleado" element={<InicioEmpleado />} />
+                <Route path="/formulario" element={<FormularioCliente />} />
 
 
 
-{/* Escalas */}
-  <Route path="/escalas" element={<EscalasDashboard />} />
-  <Route path="/registro-escala" element={<RegistroEscala />} />
-  <Route path="/editar-escala" element={<EditarEscala />} />
-
-  {/* Dimensiones */}
-  <Route path="/dimensiones" element={<DimensionesDashboard />} />
-  <Route path="/registro-dimension" element={<RegistroDimension />} />
-  <Route path="/editar-dimension" element={<EditarDimension />} />
 
 
-    {/* Rutas de Cuestionarios */}
-    <Route path="/cuestionarios" element={<CuestionariosDashboard />} />
-    <Route path="/registro-cuestionario" element={<RegistroCuestionario />} />
-    <Route path="/editar-cuestionario" element={<EditarCuestionario />} />
+                {/* Escalas */}
+                <Route path="/escalas" element={<EscalasDashboard />} />
+                <Route path="/registro-escala" element={<RegistroEscala />} />
+                <Route path="/editar-escala" element={<EditarEscala />} />
 
-    {/* Rutas de Secciones */}
-    <Route path="/secciones/:cuestionarioId" element={<SeccionesDashboard />} />
-    <Route path="/registro-seccion" element={<RegistroSeccion />} />
-    <Route path="/editar-seccion" element={<EditarSeccion />} />
-<Route path="/inicio_clientes" element={<inicio_clientes />} />
-    <Route path="/inicio_empleado" element={<inicio_empleado />} />
+                {/* Dimensiones */}
+                <Route path="/dimensiones" element={<DimensionesDashboard />} />
+                <Route path="/registro-dimension" element={<RegistroDimension />} />
+                <Route path="/editar-dimension" element={<EditarDimension />} />
+
+
+                {/* Rutas de Cuestionarios */}
+                <Route path="/cuestionarios" element={<CuestionariosDashboard />} />
+                <Route path="/registro-cuestionario" element={<RegistroCuestionario />} />
+                <Route path="/editar-cuestionario" element={<EditarCuestionario />} />
+
+                {/* Rutas de Secciones */}
+                <Route path="/secciones/:cuestionarioId" element={<SeccionesDashboard />} />
+                <Route path="/registro-seccion" element={<RegistroSeccion />} />
+                <Route path="/editar-seccion" element={<EditarSeccion />} />
+                <Route path="/inicio_clientes" element={<inicio_clientes />} />
+                <Route path="/inicio_empleado" element={<inicio_empleado />} />
 
 
 
@@ -116,7 +122,7 @@ function App() {
                 <Route path="/preguntas" element={<ReactivosDashboard />} />
                 <Route path="/agregarusuarios" element={<AgregarUsuarios />} />
                 <Route path="/agregarreactivo" element={<AgregarReactivo />} />
-                </Routes>
+              </Routes>
             </div>
           </Router>
         </SnackbarProvider>
