@@ -19,7 +19,7 @@ const DashboardMenu = () => {
     { label: 'Análisis', path: '/analisis' },
     { label: 'Cuestionarios', path: '/cuestionarios' },
     { label: 'Preguntas', path: '/preguntas' },
-    { label: 'Registrar Empleado', path: '/agregarusuarios' },
+    { label: 'Cliente -Empleado', path: '/Empleados-dashboard' },
   ];
 
   return (

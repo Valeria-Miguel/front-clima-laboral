@@ -5,38 +5,43 @@ import Footer from '../../components/Footer';
 import '../../styles/RegistroEmpresa.css';
 import ApiConfig from '../../apiConfig';
 
-const EditarUsuario = () => {
+const EditarEmpleado = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { usuarioData } = location.state || {};
+  const { empleadoData, empresa } = location.state || {};
+
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const fetchUsuario = async () => {
+    const fetchEmpleado = async () => {
       try {
-        if (!usuarioData?._id) {
-          throw new Error('No se proporcionaron datos del usuario');
-        }
-        
-        const response = await fetch(`${ApiConfig.baseURL}/usuarios/${usuarioData._id}`);
+        if (!empleadoData?._id) throw new Error('No se proporcionaron datos del empleado');
+
+        const response = await fetch(`${ApiConfig.baseURL}/empleados_clientes/obtener/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: empleadoData._id }),
+      });
+
+       
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || 'No se pudo cargar el usuario');
-        
+        if (!response.ok) throw new Error(data.message || 'No se pudo cargar el empleado');
+
         setForm(data);
       } catch (err) {
         setModalMessage(err.message);
         setShowModal(true);
-        setTimeout(() => navigate('/usuarios'), 2000);
+        setTimeout(() => navigate('/empresa-empleados', { state: { empresa } }), 2000);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUsuario();
-  }, [usuarioData, navigate]);
+    fetchEmpleado();
+  }, [empleadoData, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,57 +51,50 @@ const EditarUsuario = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (!usuarioData?._id) {
-        throw new Error('ID de usuario no disponible');
-      }
+      if (!empleadoData?._id) throw new Error('ID de empleado no disponible');
 
-      const updatedForm = { ...form };
+      const payload = {
+        id: empleadoData._id,
+        nombres: form.nombres,
+        apellidos: form.apellidos,
+        telefono: form.telefono,
+        email: form.email,
+      };
 
-      // Si el campo password está vacío, no se incluye
-      if (!updatedForm.password || updatedForm.password.trim() === '') {
-        delete updatedForm.password;
-      }
-      updatedForm.rol = "Administrador";
-      
-      const response = await fetch(`${ApiConfig.baseURL}/usuarios/${usuarioData._id}`, {
+      const response = await fetch(`${ApiConfig.baseURL}/empleados_clientes/editar`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updatedForm),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Error al actualizar usuario');
-      }
+      if (!response.ok) throw new Error(data.message || 'Error al actualizar el empleado');
 
-      setModalMessage('✅ Usuario actualizado correctamente');
+      setModalMessage('✅ Empleado actualizado correctamente');
       setShowModal(true);
-      setTimeout(() => navigate('/usuarios'), 2000);
+      setTimeout(() => navigate('/empresa-empleados', { state: { empresa } }), 2000);
     } catch (err) {
       setModalMessage(`❌ Error: ${err.message}`);
       setShowModal(true);
     }
   };
 
-  if (loading || !form) return <p className="text-center">Cargando usuario...</p>;
+  if (loading || !form) return <p className="text-center">Cargando empleado...</p>;
 
   return (
     <>
       <Header />
       <div className="registro-container">
         <div className="registro-form-wrapper">
-          <h2 className="text-center mb-4">Editar Usuario-Administrador</h2>
+          <h2 className="text-center mb-4">Editar Empleado</h2>
           <form className="registro-form" onSubmit={handleSubmit}>
             <div className="form-grid">
               {[ 
-                { label: 'Nombre', name: 'nombre' },
+                { label: 'Nombres', name: 'nombres' },
                 { label: 'Apellidos', name: 'apellidos' },
                 { label: 'Teléfono', name: 'telefono' },
-                { label: 'Correo Electrónico', name: 'email', type: 'email' },
-                { label: 'Contraseña', name: 'password', type: 'password', placeholder: 'Dejar vacío para no cambiar' },
-              ].map(({ label, name, type = 'text', placeholder }) => (
+                { label: 'Correo Electrónico', name: 'email', type: 'email' }
+              ].map(({ label, name, type = 'text' }) => (
                 <div className="form-group" key={name}>
                   <label htmlFor={name}>{label}</label>
                   <input
@@ -106,8 +104,7 @@ const EditarUsuario = () => {
                     className="registro-input"
                     value={form[name] || ''}
                     onChange={handleChange}
-                    placeholder={placeholder || ''}
-                    {...(name !== 'password' ? { required: true } : {})}
+                    required
                   />
                 </div>
               ))}
@@ -118,7 +115,7 @@ const EditarUsuario = () => {
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={() => navigate('/usuarios')}
+                onClick={() => navigate('/empresa-empleados', { state: { empresa } })}
               >
                 Cancelar
               </button>
@@ -134,7 +131,7 @@ const EditarUsuario = () => {
             <button onClick={() => {
               setShowModal(false);
               if (modalMessage.includes('✅')) {
-                navigate('/usuarios');
+                navigate('/empresa-empleados', { state: { empresa } });
               }
             }}>
               Cerrar
@@ -147,4 +144,4 @@ const EditarUsuario = () => {
   );
 };
 
-export default EditarUsuario;
+export default EditarEmpleado;

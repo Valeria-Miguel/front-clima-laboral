@@ -6,7 +6,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
   const rol = localStorage.getItem('rol');
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/inicio-sesion" replace />;
   }
 
   if (!allowedRoles.includes(rol)) {
