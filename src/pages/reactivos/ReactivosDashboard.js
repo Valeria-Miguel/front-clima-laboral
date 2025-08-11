@@ -17,6 +17,7 @@ const PreguntasDashboard = () => {
     try {
       const response = await fetch('http://localhost:3005/api/reactivos');
       const data = await response.json();
+      console.log("ss", data);
       if (!response.ok) throw new Error(data.message || 'Error al cargar preguntas');
       setPreguntas(data);
       setTodasPreguntas(data);
@@ -133,18 +134,23 @@ const PreguntasDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {preguntas.map(pregunta => (
-                <tr key={pregunta._id}>
-                  <td>{pregunta.texto}</td>
-                  <td>{pregunta.dimension?.nombre || '—'}</td>
-                  <td>{pregunta.escala?.nombre || '—'}</td>
-                  <td>
-                    <button onClick={() => editarPregunta(pregunta)}>Editar</button>
-                    <button onClick={() => eliminarPregunta(pregunta._id)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {preguntas.map(pregunta => (
+    <tr key={pregunta._id}>
+      <td>{pregunta.texto}</td>
+      <td>{pregunta.dimension?.nombre || '—'}</td>
+      <td>
+        {pregunta.esAbierta
+          ? 'Abierta'
+          : pregunta.escala?.nombre || '—'}
+      </td>
+      <td>
+        <button onClick={() => editarPregunta(pregunta)}>Editar</button>
+        <button onClick={() => eliminarPregunta(pregunta._id)}>Eliminar</button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         )}
       </div>

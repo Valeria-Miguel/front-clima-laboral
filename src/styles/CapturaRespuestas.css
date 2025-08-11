@@ -1,0 +1,56 @@
+.captura-page {
+  padding: 1rem;
+}
+.form-group {
+  margin-bottom: 0.75rem;
+}
+.registro-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+}
+.reactivos-list {
+  margin: 1rem 0;
+}
+.reactivo-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}.captura-page {
+  padding: 1rem;
+}
+.form-group {
+  margin-bottom: 0.75rem;
+}
+.registro-input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+}
+.reactivos-list {
+  margin: 1rem 0;
+}
+.reactivo-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+.reactivo-item span {
+  flex: 1;
+}
+.error-text {
+  color: #c00;
+}
+.success-text {
+  color: #080;
+}
+
+.reactivo-item span {
+  flex: 1;
+}
+.error-text {
+  color: #c00;
+}
+.success-text {
+  color: #080;
+}

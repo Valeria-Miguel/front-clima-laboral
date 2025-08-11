@@ -105,34 +105,49 @@ const EditarEscala = () => {
             </div>
 
             <div className="form-group">
-              <label>Valores y Puntos:</label>
-              {valores.map((valor, index) => (
-                <div key={index} className="form-row">
-                  <input
-                    type="text"
-                    className="registro-input"
-                    value={valor}
-                    onChange={(e) => handleValueChange(index, e.target.value)}
-                    placeholder="Valor"
-                    required
-                  />
-                  <input
-                    type="number"
-                    className="registro-input"
-                    value={puntos[index]}
-                    onChange={(e) => handlePointChange(index, e.target.value)}
-                    placeholder="Punto"
-                    required
-                  />
-                  <button type="button" onClick={() => eliminarFila(index)} className="btn-danger">
-                    ❌
-                  </button>
-                </div>
-              ))}
-              <button type="button" onClick={agregarFila} className="btn-secondary mt-2">
-                ➕ Agregar Valor
-              </button>
-            </div>
+  <label>Valores y Puntos:</label>
+  {valores.map((valor, index) => (
+    <div key={index} className="valor-row">
+      <button
+        type="button"
+        onClick={() => eliminarFila(index)}
+        className="btn-eliminar"
+        title="Eliminar valor"
+      >
+        ❌
+      </button>
+
+      <div className="campo">
+        <label>Escribe la escala:</label>
+        <input
+          type="text"
+          className="registro-input"
+          value={valor}
+          onChange={(e) => handleValueChange(index, e.target.value)}
+          placeholder="Ej: Bueno, Excelente..."
+          required
+        />
+      </div>
+
+      <div className="campo">
+        <label>Valor de la escala:</label>
+        <input
+          type="number"
+          className="registro-input"
+          value={puntos[index]}
+          onChange={(e) => handlePointChange(index, e.target.value)}
+          placeholder="Ej: 1, 2, 3..."
+          required
+        />
+      </div>
+    </div>
+  ))}
+  <button type="button" onClick={agregarFila} className="btn-agregar">
+    ➕ Agregar Valor
+  </button>
+</div>
+
+
 
             <div className="form-buttons mt-4">
               <button type="submit" className="btn-primary">Guardar cambios</button>

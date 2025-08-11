@@ -14,6 +14,10 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ListAltIcon           from '@mui/icons-material/ListAlt';
+
+
 export function isTokenExpired(token) {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
@@ -110,6 +114,17 @@ export default function Header() {
                 >
                   DASHBOARD
                 </Button>
+                 
+             {/* Módulo 4 – Captura de Respuestas */}
+             <Button
+               sx={{ color: mainColor }}
+               component={Link}
+               to="/captura/respuestas"
+               startIcon={<ListAltIcon sx={{ color: mainColor }} />}
+             >
+               Captura Respuestas
+             </Button>
+
               </>
             )}
 

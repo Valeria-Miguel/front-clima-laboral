@@ -180,3 +180,143 @@
   border: none;
   border-radius: 10px;
 }
+
+
+.seccion-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.cuestionario-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.reactivo-card {
+  margin-bottom: 15px;
+  padding: 12px;
+  border-bottom: 1px solid #ccc;
+}
+
+.opcion-escala {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 15px;
+}
+
+.seccion-acciones {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+
+/* Botones pestaña */
+.seccion-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Contenedor del cuestionario */
+.cuestionario-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+/* Reactivo */
+.reactivo-card {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Opciones de escala */
+.opcion-escala {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+/* Textarea deshabilitado para respuestas abiertas */
+.reactivo-textarea-disabled {
+  width: 100%;
+  padding: 8px;
+  resize: vertical;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #555;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+/* Botones Editar y Eliminar sección */
+.seccion-acciones {
+  margin-top: 25px;
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 10px 18px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  user-select: none;
+}
+
+.btn-edit {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #218838;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
