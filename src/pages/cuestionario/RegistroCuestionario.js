@@ -4,13 +4,14 @@ import Footer from '../../components/Footer';
 import ApiConfig from '../../apiConfig';
 import '../../styles/RegistroEmpresa.css';
 
-/**
- * Registro de Cuestionario (versión líder):
- * - Botón "Seleccionar" -> muestra radios CLIMA / NOM035 (sin select y sin valor por defecto)
- * - Al elegir empresa: muestra N (numEmplEmpresa)
- * - Si tipo = NOM035: calcula muestra recomendada (Ecuación 1) y obliga cantidad >= muestra
- * - Submit: crea el cuestionario (guardando "limiteCuestionarios") y genera 1 solo código
- */
+const CALC_SAMPLE = (N) => {
+  const num = Number(N || 0);
+  if (!num || num < 1) return 0;
+  // Fórmula NOM-035 (95% / 5%)
+  const n = (0.9604 * num) / (0.0025 * (num - 1) + 0.9604);
+  return Math.max(1, Math.floor(n));
+};
+
 export default function RegistroCuestionario() {
   const [empresas, setEmpresas] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function RegistroCuestionario() {
 
   const [form, setForm] = useState({
     clienteId: '',
-    tipoBackend: '',    // 'CLIMA' o 'NOM035'
+    tipoBackend: '',    // 'CLIMA' | 'NOM035' | 'MIXTO'
     nombre: '',
     cantidad: ''        // límite de cuestionarios a contestar
   });
@@ -46,28 +47,20 @@ export default function RegistroCuestionario() {
     })();
   }, []);
 
-  // Buscar empresa seleccionada
   const empresaSel = useMemo(
     () => empresas.find(e => String(e._id) === String(form.clienteId)),
     [empresas, form.clienteId]
   );
 
-  // Setear N al cambiar empresa
   useEffect(() => {
     setNEmpleados(Number(empresaSel?.numEmplEmpresa || 0));
   }, [empresaSel]);
 
-  // Ecuación 1 (95% conf, ±5%)
-  const muestraRecomendada = useMemo(() => {
-    const N = Number(nEmpleados || 0);
-    if (!N || N <= 0) return 0;
-    const n = (N * 0.9604) / (0.0025 * (N - 1) + 0.9604);
-    return Math.ceil(n);
-  }, [nEmpleados]);
+  const muestraRecomendada = useMemo(() => CALC_SAMPLE(nEmpleados), [nEmpleados]);
 
-  // Si el tipo es NOM035 y no hay cantidad, propone la muestra
+  // sugerencia de cantidad cuando el tipo requiere muestra (NOM035 o MIXTO)
   useEffect(() => {
-    if (form.tipoBackend === 'NOM035') {
+    if (form.tipoBackend === 'NOM035' || form.tipoBackend === 'MIXTO') {
       setForm(prev => ({
         ...prev,
         cantidad: prev.cantidad ? prev.cantidad : (muestraRecomendada ? String(muestraRecomendada) : '')
@@ -105,8 +98,8 @@ export default function RegistroCuestionario() {
     if (!tipoBackend) return setError('Selecciona el tipo de cuestionario.');
     if (!nombre) return setError('Ingresa el nombre del cuestionario.');
 
-    // Validación de muestra para NOM035
-    if (tipoBackend === 'NOM035') {
+    // Validación de muestra
+    if (tipoBackend === 'NOM035' || tipoBackend === 'MIXTO') {
       if (!cantidadNum || cantidadNum < muestraRecomendada) {
         return setError(`La cantidad no puede ser menor a la muestra recomendada (${muestraRecomendada}).`);
       }
@@ -120,16 +113,15 @@ export default function RegistroCuestionario() {
       setLoading(true);
 
       // 1) Crear cuestionario (guardamos un límite en el cuestionario)
-      const resp1 = await fetch(`${ApiConfig.baseURL}/cuestionarios`, {
+      const resp1 = await fetch(`${ApiConfig.baseURL}/api/cuestionarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // OJO: el backend espera tipo 'CLIMA' | 'NOM035'
         body: JSON.stringify({
           clienteId,
-          tipo: tipoBackend,
+          tipo: tipoBackend,                     // 'CLIMA' | 'NOM035' | 'MIXTO' (si tu backend mantiene 2, mapea MIXTO como 'NOM035' o agrega soporte)
           nombre,
-          limiteCuestionarios: cantidadNum,  // lo guardamos en el cuestionario
-          requiereMuestra: (tipoBackend === 'NOM035')
+          limiteCuestionarios: cantidadNum,
+          requiereMuestra: (tipoBackend === 'NOM035' || tipoBackend === 'MIXTO')
         })
       });
       const data1 = await resp1.json();
@@ -158,7 +150,6 @@ export default function RegistroCuestionario() {
     }
   };
 
-  // Descargar CSV con un solo código
   const handleDownloadCSV = () => {
     if (!codigoUnico) return;
     const rows = [
@@ -186,7 +177,7 @@ export default function RegistroCuestionario() {
         </div>
 
         <form className="form-card" onSubmit={handleSubmit}>
-          {/* Tipo con "Seleccionar" y radios */}
+          {/* Tipo */}
           <div className="form-row">
             <label>Tipo de cuestionario</label>
             <div style={{ display:'flex', gap: '8px', alignItems:'center', flexWrap:'wrap' }}>
@@ -209,7 +200,7 @@ export default function RegistroCuestionario() {
                     />
                     <span style={{ marginLeft:8 }}>CLIMA</span>
                   </label>
-                  <label style={{ display:'block' }}>
+                  <label style={{ display:'block', marginBottom:6 }}>
                     <input
                       type="radio"
                       name="tipoBackend"
@@ -217,6 +208,15 @@ export default function RegistroCuestionario() {
                       onChange={() => seleccionarTipo('NOM035')}
                     />
                     <span style={{ marginLeft:8 }}>NOM035</span>
+                  </label>
+                  <label style={{ display:'block' }}>
+                    <input
+                      type="radio"
+                      name="tipoBackend"
+                      checked={form.tipoBackend === 'MIXTO'}
+                      onChange={() => seleccionarTipo('MIXTO')}
+                    />
+                    <span style={{ marginLeft:8 }}>CLIMA + NOM035 (Mixto)</span>
                   </label>
                 </div>
               )}
@@ -240,7 +240,7 @@ export default function RegistroCuestionario() {
             </select>
           </div>
 
-          {/* Nombre cuestionario */}
+          {/* Nombre */}
           <div className="form-row">
             <label>Nombre del cuestionario</label>
             <input
@@ -260,9 +260,8 @@ export default function RegistroCuestionario() {
             <div>
               <label>Recomendación (muestra)</label>
               <input
-                value={form.tipoBackend === 'NOM035' ? (muestraRecomendada || '') : ''}
+                value={muestraRecomendada || ''}
                 readOnly
-                placeholder="Sólo aplica para NOM035"
               />
             </div>
           </div>
@@ -279,7 +278,7 @@ export default function RegistroCuestionario() {
               placeholder="Ej. 80"
             />
             <small>
-              {form.tipoBackend === 'NOM035'
+              {(form.tipoBackend === 'NOM035' || form.tipoBackend === 'MIXTO')
                 ? `Debe ser ≥ muestra recomendada (${muestraRecomendada}).`
                 : 'Define el límite de respuestas para este cuestionario.'}
             </small>

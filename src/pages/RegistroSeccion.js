@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+/* import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -24,7 +24,7 @@ const RegistroSeccion = () => {
   useEffect(() => {
     const fetchReactivos = async () => {
       try {
-        const res = await fetch('http://localhost:3005/api/reactivos');
+        const res = await fetch('http://localhost:3001/api/reactivos');
         const data = await res.json();
         setReactivos(data);
       } catch (error) {
@@ -56,7 +56,7 @@ const RegistroSeccion = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:3005/api/secciones', {
+      const res = await fetch('http://localhost:3001/api/secciones', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -159,3 +159,4 @@ const RegistroSeccion = () => {
 };
 
 export default RegistroSeccion;
+ */

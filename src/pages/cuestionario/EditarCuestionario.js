@@ -28,7 +28,7 @@ const EditarCuestionario = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:3005/api/cuestionarios/update', {
+      const res = await fetch('http://localhost:3001/api/cuestionarios/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: cuestionario._id, nombre, tipo }),

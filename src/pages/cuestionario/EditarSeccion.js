@@ -22,7 +22,7 @@ const EditarSeccion = () => {
 
     const fetchReactivos = async () => {
       try {
-        const res = await fetch('http://localhost:3005/api/reactivos');
+        const res = await fetch('http://localhost:3001/api/reactivos');
         const data = await res.json();
         setReactivos(data);
       } catch (error) {
@@ -68,7 +68,7 @@ const EditarSeccion = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:3005/api/secciones/update', {
+      const res = await fetch('http://localhost:3001/api/secciones/update', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

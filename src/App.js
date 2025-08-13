@@ -31,7 +31,6 @@ import EscalasDashboard from './pages/reactivos/EscalasDashboard.js';
 import EditarDimension from './pages/reactivos/EditarDimension.js';
 import EditarEscala from './pages/reactivos/EditarEscala.js';
 
-
 import CuestionariosDashboard from './pages/cuestionario/CuestionariosDashboard.js';
 import RegistroCuestionario from './pages/cuestionario/RegistroCuestionario.js';
 import EditarCuestionario from './pages/cuestionario/EditarCuestionario.js';
@@ -43,23 +42,17 @@ import InicioClientes from './pages/inicio_clientes.js';
 import InicioEmpleado from './pages/inicio_empleado.js';
 import FormularioCliente from './pages/formulario/formulario.js';
 
-//import GenerarParticipantes from './pages/captura/GenerarParticipantes';
+// import GenerarParticipantes from './pages/captura/GenerarParticipantes';
 import CapturaRespuestas   from './pages/captura/CapturaRespuestas';
 
 import './App.css';
 
 const theme = createTheme({
   palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
+    primary: { main: '#1976d2' },
+    secondary:{ main: '#dc004e' },
   },
-  typography: {
-    fontFamily: 'Roboto, sans-serif',
-  },
+  typography: { fontFamily: 'Roboto, sans-serif' },
 });
 
 function App() {
@@ -90,10 +83,6 @@ function App() {
                 <Route path="/inicio_empleado" element={<InicioEmpleado />} />
                 <Route path="/formulario" element={<FormularioCliente />} />
 
-
-
-
-
                 {/* Escalas */}
                 <Route path="/escalas" element={<EscalasDashboard />} />
                 <Route path="/registro-escala" element={<RegistroEscala />} />
@@ -104,32 +93,19 @@ function App() {
                 <Route path="/registro-dimension" element={<RegistroDimension />} />
                 <Route path="/editar-dimension" element={<EditarDimension />} />
 
-
-                {/* Rutas de Cuestionarios */}
+                {/* Cuestionarios */}
                 <Route path="/cuestionarios" element={<CuestionariosDashboard />} />
                 <Route path="/registro-cuestionario" element={<RegistroCuestionario />} />
                 <Route path="/editar-cuestionario" element={<EditarCuestionario />} />
 
-                {/* Rutas de Secciones */}
+                {/* Secciones */}
                 <Route path="/secciones/:cuestionarioId" element={<SeccionesDashboard />} />
                 <Route path="/registro-seccion" element={<RegistroSeccion />} />
                 <Route path="/editar-seccion" element={<EditarSeccion />} />
-                <Route path="/inicio_clientes" element={<inicio_clientes />} />
-                <Route path="/inicio_empleado" element={<inicio_empleado />} />
 
-
-
-                <Route path="/EditarCliente" element={<EditarCliente />} />
-                <Route path="/EditarUsuario" element={<EditarUsuario />} />
-                <Route path="/EditarReactivo" element={<EditarReactivo />} />
-                <Route path="/usuarios" element={<UsuariosDashboard />} />
-                <Route path="/preguntas" element={<ReactivosDashboard />} />
-                <Route path="/agregarusuarios" element={<AgregarUsuarios />} />
-                <Route path="/agregarreactivo" element={<AgregarReactivo />} />
-
-                 {/* <Route path="/captura/generar" element={<GenerarParticipantes />} /> */}
-                 <Route path="/captura/respuestas" element={<CapturaRespuestas />} />
-
+                {/* Captura */}
+                {/* <Route path="/captura/generar" element={<GenerarParticipantes />} /> */}
+                <Route path="/captura/respuestas" element={<CapturaRespuestas />} />
               </Routes>
             </div>
           </Router>
