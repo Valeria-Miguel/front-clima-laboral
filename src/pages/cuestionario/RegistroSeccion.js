@@ -1,21 +1,19 @@
 // src/pages/cuestionario/RegistroSeccion.js
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import '../../styles/RegistroEmpresa.css';
-
-import axios from 'axios';
+import '../../styles/RegistroEmpresa.css'; // UI antigua (paneles con ▲/▼)
 import ApiConfig from '../../apiConfig';
+import axios from 'axios';
 
-// Base segura, sin barras finales
-const BASE =
-  (typeof ApiConfig === 'string' ? ApiConfig : ApiConfig.baseURL).replace(/\/+$/, '');
+const BASE = (typeof ApiConfig === 'string' ? ApiConfig : ApiConfig.baseURL).replace(/\/+$/, '');
 
 export default function RegistroSeccion() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // admite state o querystring ?cuestionarioId=...
   const stateId = location.state?.cuestionarioId || '';
   const q = new URLSearchParams(location.search);
   const cuestionarioId = stateId || q.get('cuestionarioId') || '';
@@ -24,6 +22,7 @@ export default function RegistroSeccion() {
   const [numero, setNumero] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [tipo, setTipo] = useState('MIXTO');      // CLIMA | NOM035 | MIXTO
   const [reactivos, setReactivos] = useState([]); // [{ _id, texto, catalogo, grupo }]
   const [seleccionados, setSeleccionados] = useState(new Map());
   const [expanded, setExpanded] = useState({});
@@ -31,32 +30,40 @@ export default function RegistroSeccion() {
 
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       try {
         setLoading(true);
 
-        // Carga CLIMA y NOM035 (por el gateway)
+        // 1) Tipo del cuestionario desde listado
+        try {
+          const r = await axios.get(`${BASE}/api/cuestionarios`, {
+            headers: { Accept: 'application/json' }
+          });
+          const arr = Array.isArray(r.data) ? r.data : (r.data?.items || []);
+          const c = arr.find((x) => String(x._id) === String(cuestionarioId));
+          if (c?.tipo) setTipo(c.tipo);
+        } catch {}
+
+        // 2) Cargar catálogos (ambos; la UI filtrará según "tipo")
         const [climaRes, nomRes] = await Promise.all([
-          axios.get(`${BASE}/api/reactivos`, { headers: { Accept: 'application/json' } }),
-          axios.get(`${BASE}/api/nom035-reactivos`, { headers: { Accept: 'application/json' } }),
+          axios.get(`${BASE}/api/reactivos`, { headers: { Accept: 'application/json' }, validateStatus: () => true }),
+          axios.get(`${BASE}/api/nom035-reactivos`, { headers: { Accept: 'application/json' }, validateStatus: () => true })
         ]);
 
-        const clima = climaRes.data;
-        const nom = nomRes.data;
+        const clima = Array.isArray(climaRes.data) ? climaRes.data : (climaRes.data?.items || []);
+        const nom   = Array.isArray(nomRes.data)   ? nomRes.data   : (nomRes.data?.items   || []);
 
-        const flatClima = (clima?.items || clima || []).map(r => ({
+        const flatClima = (clima || []).map((r) => ({
           _id: r._id,
           texto: r.texto || r.pregunta || r.enunciado,
           catalogo: 'CLIMA',
-          grupo: r.dimension?.nombre || r.dimension || r.grupo || 'General',
+          grupo: r.dimension?.nombre || r.dimension || r.grupo || 'General'
         }));
-
-        const flatNom = (nom?.items || nom || []).map(r => ({
+        const flatNom = (nom || []).map((r) => ({
           _id: r._id,
           texto: r.texto || r.pregunta || r.enunciado,
           catalogo: 'NOM035',
-          grupo: r.dominio || r.categoria || 'NOM-035',
+          grupo: r.dominio || r.categoria || 'NOM-035'
         }));
 
         if (mounted) setReactivos([...flatClima, ...flatNom]);
@@ -68,21 +75,28 @@ export default function RegistroSeccion() {
       }
     })();
 
-    return () => { mounted = false; };
-  }, []);
+    return () => {
+      mounted = false;
+    };
+  }, [cuestionarioId]);
 
+  // Agrupar por “CLIMA — Dimensión” o “NOM035 — Grupo”
   const grupos = useMemo(() => {
+    const allowed = new Set(
+      tipo === 'CLIMA' ? ['CLIMA'] : tipo === 'NOM035' ? ['NOM035'] : ['CLIMA', 'NOM035']
+    );
     const m = new Map();
     for (const r of reactivos) {
+      if (!allowed.has(r.catalogo)) continue;
       const key = `${r.catalogo} — ${r.grupo}`;
       if (!m.has(key)) m.set(key, []);
       m.get(key).push(r);
     }
     return Array.from(m.entries()); // [[grupo, items], ...]
-  }, [reactivos]);
+  }, [reactivos, tipo]);
 
   const toggleReactivo = (r) => {
-    setSeleccionados(prev => {
+    setSeleccionados((prev) => {
       const next = new Map(prev);
       if (next.has(r._id)) next.delete(r._id);
       else next.set(r._id, r);
@@ -104,24 +118,25 @@ export default function RegistroSeccion() {
       reactivos: Array.from(seleccionados.values()).map((r, idx) => ({
         reactivoId: r._id,
         catalogo: r.catalogo, // 'CLIMA' o 'NOM035'
-        orden: idx + 1,
+        orden: idx + 1
       })),
+      catalogoDefault: tipo === 'NOM035' ? 'NOM035' : 'CLIMA'
     };
 
     try {
       setLoading(true);
 
-      // Primero intentamos vía gateway con /api...
+      // Intento principal vía gateway
       let res = await axios.post(`${BASE}/api/secciones`, payload, {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        validateStatus: () => true,
+        validateStatus: () => true
       });
 
-      // Si el gateway no tiene mapeada /api/secciones (404 con HTML), probamos sin /api.
-      if (res.status === 404 && typeof res.data === 'string' && /Cannot GET/i.test(res.data)) {
+      // Fallback sin /api si el gateway no mapea esa ruta
+      if (res.status === 404 && typeof res.data === 'string' && /Cannot (GET|POST)/i.test(res.data)) {
         res = await axios.post(`${BASE}/secciones`, payload, {
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          validateStatus: () => true,
+          validateStatus: () => true
         });
       }
 
@@ -156,7 +171,7 @@ export default function RegistroSeccion() {
               <select
                 className="registro-input"
                 value={numero}
-                onChange={e => setNumero(e.target.value)}
+                onChange={(e) => setNumero(e.target.value)}
                 required
               >
                 <option value="">Selecciona una opción</option>
@@ -172,53 +187,65 @@ export default function RegistroSeccion() {
               <input
                 className="registro-input"
                 value={titulo}
-                onChange={e => setTitulo(e.target.value)}
+                onChange={(e) => setTitulo(e.target.value)}
                 placeholder="Ej. Condiciones de trabajo"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label>Selecciona Reactivos (preguntas):</label>
+              <label>
+                Selecciona Reactivos (preguntas){' '}
+                <span style={{ color: '#6b7280' }}>
+                  — {tipo === 'MIXTO' ? 'CLIMA + NOM035' : tipo === 'CLIMA' ? 'Sólo CLIMA' : 'Sólo NOM035'}
+                </span>
+              </label>
 
               {loading && <div className="mt-2">Cargando…</div>}
 
-              {!loading && grupos.map(([grupo, items]) => (
-                <div key={grupo} className="dimension-panel">
-                  <div
-                    className="dimension-header"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setExpanded(prev => ({ ...prev, [grupo]: !prev[grupo] }))}
-                    onKeyDown={(e) => { if (e.key === 'Enter') setExpanded(prev => ({ ...prev, [grupo]: !prev[grupo] })); }}
-                  >
-                    <strong>{grupo}</strong>
-                    <span>{expanded[grupo] ? '▲' : '▼'}</span>
-                  </div>
-
-                  {expanded[grupo] && (
-                    <div className="dimension-content">
-                      {items.map(r => (
-                        <label key={r._id} className="reactivo-label">
-                          <input
-                            type="checkbox"
-                            checked={seleccionados.has(r._id)}
-                            onChange={() => toggleReactivo(r)}
-                          />
-                          {r.texto}
-                        </label>
-                      ))}
+              {!loading &&
+                grupos.map(([grupo, items]) => (
+                  <div key={grupo} className="dimension-panel">
+                    <div
+                      className="dimension-header"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setExpanded((prev) => ({ ...prev, [grupo]: !prev[grupo] }))}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') setExpanded((prev) => ({ ...prev, [grupo]: !prev[grupo] }));
+                      }}
+                    >
+                      <strong>{grupo}</strong>
+                      <span>{expanded[grupo] ? '▲' : '▼'}</span>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {expanded[grupo] && (
+                      <div className="dimension-content">
+                        {items.map((r) => (
+                          <label key={r._id} className="reactivo-label">
+                            <input
+                              type="checkbox"
+                              checked={seleccionados.has(r._id)}
+                              onChange={() => toggleReactivo(r)}
+                            />
+                            {r.texto}
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
 
             <div className="form-buttons">
               <button type="submit" className="btn-primary" disabled={loading}>
                 {loading ? 'Guardando…' : 'Registrar'}
               </button>
-              <button type="button" className="btn-secondary" onClick={() => navigate(`/secciones/${cuestionarioId}`)}>
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => navigate(`/secciones/${cuestionarioId}`)}
+              >
                 Cancelar
               </button>
             </div>

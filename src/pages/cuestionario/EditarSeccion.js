@@ -1,47 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import '../../styles/RegistroEmpresa.css';
 
+/** Utils */
+const cleanOid = (s) => (String(s || '').match(/[0-9a-fA-F]{24}/)?.[0] || '');
+const romanToNum = (v) => ({ I: '1', II: '2', III: '3', IV: '4' }[v] || String(v || ''));
+
+const API_SECC_BASES = [
+  'http://localhost:3001/api', // gateway
+  'http://localhost:3005',     // micro cuestionarios (fallback)
+];
+
+const getJsonSafe = async (res) => {
+  const ct = (res.headers.get('content-type') || '').toLowerCase();
+  const text = await res.text();
+  if (!ct.includes('application/json')) {
+    const msg = text?.slice(0, 200) || 'Respuesta no JSON';
+    throw new Error(`HTTP ${res.status} ${res.statusText} - ${msg}`);
+  }
+  try { return JSON.parse(text || '{}'); }
+  catch { throw new Error(`No se pudo parsear JSON (HTTP ${res.status}).`); }
+};
+
+const postJsonSafe = async (url, body) => {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await getJsonSafe(res);
+  if (!res.ok) throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+  return data;
+};
+
 const EditarSeccion = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams();
   const { seccion } = location.state || {};
 
+  // --- estado principal ---
   const [titulo, setTitulo] = useState(seccion?.titulo || '');
-  const [numero, setNumero] = useState(seccion?.numero || '');
-  const [reactivos, setReactivos] = useState([]);
-  const [reactivosSeleccionados, setReactivosSeleccionados] = useState(seccion?.reactivos?.map(r => r._id || r) || []);
+  const [numero, setNumero] = useState(romanToNum(seccion?.numero) || '');
+  const [reactivos, setReactivos] = useState([]); // catálogo CLIMA para checkboxes
+  const [reactivosSeleccionados, setReactivosSeleccionados] = useState([]);
   const [expandedDims, setExpandedDims] = useState({});
   const [modalMessage, setModalMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
-    if (!seccion) return navigate('/cuestionarios');
+  // id limpio del cuestionario (de la seccion o de la ruta)
+  const cuestionarioId = useMemo(() => (
+    cleanOid(seccion?.cuestionarioId || params?.cuestionarioId)
+  ), [seccion, params]);
 
-    const fetchReactivos = async () => {
+  // ids preseleccionados (solo CLIMA si hay NOM035 no están en la lista, pero los preservamos al guardar)
+  useEffect(() => {
+    const ids = (seccion?.reactivos || [])
+      .map(r => cleanOid(r?.reactivoId || r?._id || r));
+    setReactivosSeleccionados(ids.filter(Boolean));
+  }, [seccion]);
+
+  // Cargar catálogo de reactivos CLIMA para pintar checkboxes
+  useEffect(() => {
+    if (!seccion) {
+      navigate('/cuestionarios');
+      return;
+    }
+    (async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/reactivos');
-        const data = await res.json();
-        setReactivos(data);
-      } catch (error) {
+        const res = await fetch('http://localhost:3001/api/reactivos', { headers: { Accept: 'application/json' } });
+        const data = await getJsonSafe(res);
+        setReactivos(Array.isArray(data) ? data : []);
+      } catch (err) {
         setModalMessage('Error al cargar reactivos');
         setShowModal(true);
       }
-    };
-    fetchReactivos();
+    })();
   }, [navigate, seccion]);
 
-  const dimensionesMap = reactivos.reduce((acc, reactivo) => {
-    const dimId = reactivo.dimension?._id || 'sin-dimension';
-    if (!acc[dimId]) {
-      acc[dimId] = {
-        dimension: reactivo.dimension,
-        reactivos: [],
-      };
-    }
-    acc[dimId].reactivos.push(reactivo);
+  // Agrupar por dimensión (solo CLIMA)
+  const dimensionesMap = (reactivos || []).reduce((acc, r) => {
+    const dimId = r.dimension?._id || 'sin-dimension';
+    if (!acc[dimId]) acc[dimId] = { dimension: r.dimension, reactivos: [] };
+    acc[dimId].reactivos.push(r);
     return acc;
   }, {});
 
@@ -50,45 +93,63 @@ const EditarSeccion = () => {
       prev.includes(id) ? prev.filter(rid => rid !== id) : [...prev, id]
     );
   };
+  const toggleDimension = (dimId) => setExpandedDims(prev => ({ ...prev, [dimId]: !prev[dimId] }));
 
-  const toggleDimension = (dimId) => {
-    setExpandedDims(prev => ({
-      ...prev,
-      [dimId]: !prev[dimId]
-    }));
-  };
-
+  /** Guardar: POST /secciones (fallback a micro). Mantiene NOM035 previos. */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!titulo || !numero || reactivosSeleccionados.length === 0) {
-      setModalMessage('Todos los campos son obligatorios y debes seleccionar al menos un reactivo');
+    if (!titulo || !numero || !cuestionarioId) {
+      setModalMessage('Todos los campos son obligatorios.');
       setShowModal(true);
       return;
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/secciones/update', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: seccion._id,
-          titulo,
-          numero,
-          reactivos: reactivosSeleccionados,
-        }),
-      });
+      // 1) CLIMA seleccionados desde UI
+      const reactivosClima = reactivosSeleccionados
+        .map((id) => cleanOid(id))
+        .filter(Boolean)
+        .map((oid) => ({ reactivoId: oid, catalogo: 'CLIMA' }));
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Error al actualizar la sección');
+      // 2) Preservar NOM035 (u otros) previos que ya tuviera la sección
+      const prevNoClima = (seccion?.reactivos || [])
+        .filter((r) => (r?.catalogo || 'CLIMA').toUpperCase() !== 'CLIMA')
+        .map((r) => ({
+          reactivoId: cleanOid(r?.reactivoId || r?._id || r?.id),
+          catalogo: (r?.catalogo || 'NOM035').toUpperCase(),
+        }))
+        .filter((x) => x.reactivoId);
+
+      // 3) Unir y asignar orden
+      const union = [...prevNoClima, ...reactivosClima]
+        .filter((x, i, arr) => x.reactivoId && arr.findIndex(y => y.reactivoId === x.reactivoId) === i)
+        .map((x, i) => ({ ...x, orden: i + 1 }));
+
+      const payload = {
+        cuestionarioId,
+        numero: Number(numero),
+        titulo: String(titulo || '').trim(),
+        reactivos: union,
+      };
+
+      // 4) Intentar por gateway y luego por micro
+      let ok = false, lastErr = null;
+      for (const base of API_SECC_BASES) {
+        try {
+          await postJsonSafe(`${base}/secciones`, payload);
+          ok = true; break;
+        } catch (e) { lastErr = e; }
+      }
+      if (!ok) throw lastErr || new Error('No fue posible guardar');
 
       setModalMessage('✅ Sección actualizada correctamente');
       setShowModal(true);
 
       setTimeout(() => {
         setShowModal(false);
-        navigate(`/secciones/${seccion.cuestionarioId}`);
-      }, 2000);
+        navigate(`/secciones/${cuestionarioId}`);
+      }, 1000);
     } catch (err) {
       setModalMessage(err.message);
       setShowModal(true);
@@ -131,7 +192,7 @@ const EditarSeccion = () => {
             </div>
 
             <div className="form-group">
-              <label>Selecciona Reactivos (preguntas):</label>
+              <label>Selecciona Reactivos (preguntas CLIMA):</label>
               <div className="dimensiones-accordion">
                 {Object.entries(dimensionesMap).map(([dimId, { dimension, reactivos }]) => (
                   <div key={dimId} className="dimension-panel">
@@ -140,31 +201,39 @@ const EditarSeccion = () => {
                       onClick={() => toggleDimension(dimId)}
                       role="button"
                       tabIndex={0}
-                      onKeyDown={(e) => { if (e.key === 'Enter') toggleDimension(dimId) }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') toggleDimension(dimId); }}
                     >
                       <strong>{dimension?.nombre || 'Sin dimensión'}</strong>
                       <span>{expandedDims[dimId] ? '▲' : '▼'}</span>
                     </div>
                     {expandedDims[dimId] && (
                       <div className="dimension-content">
-                        {reactivos.map(r => (
-                          <label
-                            key={r._id}
-                            className={`reactivo-label ${r.esAbierta ? 'reactivo-abierta' : ''}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={reactivosSeleccionados.includes(r._id)}
-                              onChange={() => toggleReactivo(r._id)}
-                            />
-                            {r.texto} {r.esAbierta && <em>(Respuesta abierta)</em>}
-                          </label>
-                        ))}
+                        {reactivos.map(r => {
+                          const rid = cleanOid(r?._id);
+                          const checked = reactivosSeleccionados.includes(rid);
+                          return (
+                            <label key={rid} className={`reactivo-label ${r.esAbierta ? 'reactivo-abierta' : ''}`}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() =>
+                                  setReactivosSeleccionados(prev =>
+                                    checked ? prev.filter(x => x !== rid) : [...prev, rid]
+                                  )
+                                }
+                              />
+                              {r.texto} {r.esAbierta && <em>(Respuesta abierta)</em>}
+                            </label>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
                 ))}
               </div>
+              <small style={{ display: 'block', marginTop: 8 }}>
+                * Los reactivos NOM035 previamente guardados se conservan al actualizar.
+              </small>
             </div>
 
             <div className="form-buttons">
@@ -172,7 +241,7 @@ const EditarSeccion = () => {
               <button
                 type="button"
                 className="btn-secondary"
-                onClick={() => navigate(`/secciones/${seccion.cuestionarioId}`)}
+                onClick={() => navigate(`/secciones/${cuestionarioId}`)}
               >
                 Cancelar
               </button>
