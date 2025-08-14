@@ -1,4 +1,4 @@
-// src/pages/captura/GenerarParticipantes.js
+/* // src/pages/captura/GenerarParticipantes.js
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -108,3 +108,4 @@ export default function GenerarParticipantes() {
     </div>
   );
 }
+ */
