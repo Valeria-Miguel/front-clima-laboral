@@ -191,7 +191,7 @@ const SeccionesDashboard = () => {
           <h2 style={{ marginRight: 'auto' }}>Cuestionario: Secciones</h2>
 
           {/* selector de tipo */}
-          <select
+          {/* <select
             value={tipo}
             onChange={(e) => setTipo(e.target.value)}
             className="form-select"
@@ -201,7 +201,7 @@ const SeccionesDashboard = () => {
             <option value="MIXTO">Mixto (todos)</option>
             <option value="CLIMA">CLIMA</option>
             <option value="NOM035">NOM035</option>
-          </select>
+          </select> */}
 
           <button
             className="btn-primary"

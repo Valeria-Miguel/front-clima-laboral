@@ -8,6 +8,9 @@ import ApiConfig from '../../apiConfig';
 
 // ================== Helpers ==================
 const API_BASE = ApiConfig.baseURL;
+// si tu back prefiere 'abiertas', cámbialo aquí y listo
+const OPEN_KEY = 'preguntasAbiertas';
+
 
 // Endpoints en cascada (con y sin /api y también micro directo 3005)
 const SECC_ENDPOINTS = (base, id, tipo = 'MIXTO') => ([
@@ -170,21 +173,31 @@ export default function CapturaRespuestas() {
         ...s,
         numero: romanToNum(s.numero),
         reactivos: (s.reactivos || []).map((r, i) => {
-          const rid = cleanOid(r.reactivoId || r._id || r.id || `${s.numero}-${i}`);
-          const catalogo = (r.catalogo || r.tipo || 'CLIMA').toUpperCase();
-          const dimension =
-            (r?.dimension && typeof r.dimension === 'object' && (r.dimension.nombre || r.dimension.titulo)) ||
-            (typeof r?.dimension === 'string' ? r.dimension : '') ||
-            (r?.dimensionNombre || '');
+        const rid = cleanOid(r.reactivoId || r._id || r.id || `${s.numero}-${i}`);
+        const catalogo = (r.catalogo || r.tipo || 'CLIMA').toUpperCase();
+        const dimension =
+          (r?.dimension && typeof r.dimension === 'object' && (r.dimension.nombre || r.dimension.titulo)) ||
+          (typeof r?.dimension === 'string' ? r.dimension : '') ||
+          (r?.dimensionNombre || '');
 
-          return {
-            ...r,
-            _rid: rid,
-            catalogo,
-            seccionNumero: String(s.numero),
-            _dimensionNombre: String(dimension || '').trim()
-          };
-        })
+        const esAbierta = !!(
+          r.esAbierta ||
+          r.tipo === 'ABIERTA' ||
+          r.tipoRespuesta === 'ABIERTA' ||
+          r?.escala?.tipo === 'ABIERTA' ||
+          (catalogo === 'CLIMA' && (!r?.escala?.valores || r.escala.valores.length === 0))
+        );
+
+        return {
+          ...r,
+          _rid: rid,
+          catalogo,
+          seccionNumero: String(s.numero),
+          _dimensionNombre: String(dimension || '').trim(),
+          esAbierta
+        };
+      })
+
       }));
 
       setSecciones(normalized);
@@ -264,66 +277,156 @@ export default function CapturaRespuestas() {
   }, [form.metadata]);
 
   // ====== Construir payload EXACTO de "answers" ======
-  const buildAnswersPayload = () => {
-    // índice para dimension y cat
-    const metaByRid = new Map(
-      secciones.flatMap(sec => (sec.reactivos || []).map(r => ([
-        String(r._rid),
-        {
-          catalogo: r.catalogo,
-          seccionNumero: r.seccionNumero || sec.numero,
-          escalaValores: Array.isArray(r?.escala?.valores) ? r.escala.valores : null,
-          dimension: r._dimensionNombre || ''
-        }
-      ])))
-    );
+  // === NUEVO: construir payload EXACTO para /api/respuestas/capturar ===
+const buildPayloadForCapturar = () => {
+  const cuestionarioId = cleanOid(form.cuestionarioId);
+  const participanteCodigo = String(form.participanteCodigo || '').toUpperCase();
 
-    // recolectores
-    const guiaI = [], guiaII = [], guiaIII = [];
-    const seccionI = [], seccionII = [], seccionIII = [], seccionIV = [];
+  // índice por reactivo (rid) con meta necesaria para armar cada ítem
+  const metaByRid = new Map(
+    secciones.flatMap(sec => (sec.reactivos || []).map((r, i) => {
+      const rid = String(r._rid);
+      // intenta tomar un código legible si existe (idPregunta/clave/codigo); si no, usa el _rid
+      const codigo =
+        r.idPregunta || r.clave || r.codigo || r.etiqueta || r.folio || rid;
 
-    Object.entries(respuestas).forEach(([rid, obj]) => {
-      const meta = metaByRid.get(String(rid));
-      if (!meta) return;
-      const sNum = Number(meta.seccionNumero || 0);
+      const catalogo = (r.catalogo || r.tipo || 'CLIMA').toUpperCase();
+      const dimension =
+        (r?.dimension && typeof r.dimension === 'object' && (r.dimension.nombre || r.dimension.titulo)) ||
+        (typeof r?.dimension === 'string' ? r.dimension : '') ||
+        (r?.dimensionNombre || '');
 
-      let valor = obj.valor;
+      return [rid, {
+        codigo,
+        texto: r.texto || r.pregunta || '',
+        catalogo,
+        seccionNumero: String(sec.numero || r.seccionNumero || 1),
+        escalaValores: Array.isArray(r?.escala?.valores) ? r.escala.valores : null,
+        dimension: String(dimension || '').trim(),
+        esAbierta: !!r.esAbierta
+      }];
+    }))
+  );
 
-      if (meta.catalogo === 'CLIMA') {
-        // CLIMA: si hay escala textual, convertimos a índice (1..N)
-        if (typeof valor === 'string' && Array.isArray(meta.escalaValores)) {
-          const idx = meta.escalaValores.findIndex(v => String(v) === String(valor));
-          if (idx >= 0) valor = idx + 1;
-        }
-        const item = { idPregunta: rid, valor, ...(meta.dimension ? { dimension: meta.dimension } : {}) };
-        if (sNum === 1) seccionI.push(item);
-        else if (sNum === 2) seccionII.push(item);
-        else if (sNum === 3) seccionIII.push(item);
-        else if (sNum === 4) seccionIV.push(item);
-        else seccionIII.push(item);
-      } else {
-        // NOM035 -> num
-        if (typeof valor === 'string') {
-          const m = mapNom035Valor(meta.seccionNumero, valor);
-          if (m !== null) valor = m;
-        }
-        const item = { idPregunta: rid, valor };
-        if (sNum === 1)      guiaI.push(item);
-        else if (sNum === 2) guiaII.push(item);
-        else if (sNum === 3) guiaIII.push(item);
-        else                 guiaII.push(item);
-      }
-    });
+  // cuántos CLIMA hay por sección (para "Orden 1-N")
+  const climaCountBySec = secciones.reduce((acc, sec) => {
+    const n = (sec.reactivos || []).filter(rr => (rr.catalogo || rr.tipo || 'CLIMA').toUpperCase() === 'CLIMA').length;
+    acc[String(sec.numero)] = n;
+    return acc;
+  }, {});
 
-    // EXACTO como tu colección answers:
-    const out = { id: form.participanteCodigo };
-    if (guiaVArray.length) out.guiaV = guiaVArray;
-    if (guiaI.length || guiaII.length || guiaIII.length) Object.assign(out, { guiaI, guiaII, guiaIII });
-    if (seccionI.length || seccionII.length || seccionIII.length || seccionIV.length) {
-      out.climaLaboral = { seccionI, seccionII, seccionIII, seccionIV };
-    }
-    return out;
+  // helpers escala
+  const escalaNom035 = (sNum /* 1|2|3 */) => {
+    if (String(sNum) === '1') return 'Sí/No';
+    if (String(sNum) === '2') return 'Siempre=4,Casi Siempre=3,Algunas Veces=2,Casi Nunca=1,Nunca=0';
+    // por defecto sección III
+    return 'Totalmente de acuerdo=3,De acuerdo=2,En desacuerdo=1,Totalmente desacuerdo=0';
   };
+  const escalaClima = (sNum) => `Orden 1-${climaCountBySec[String(sNum)] || ''}`;
+
+  // colecciones de salida
+  const guiaI = [], guiaII = [], guiaIII = [];
+  const seccionI = [], seccionII = [], seccionIII = [], seccionIV = [];
+  const abiertas = [];
+
+  // recorrer respuestas marcadas en UI
+  Object.entries(respuestas).forEach(([rid, obj]) => {
+    const meta = metaByRid.get(String(rid));
+    if (!meta) return;
+    if (obj?.valor === undefined || obj?.valor === '') return;
+
+    // valor a enviar:
+    // - NOM035: texto tal cual (No/Nunca/…)
+    // - CLIMA : ordinal 1..N (si la respuesta viene como texto de la escala)
+    let valor = obj.valor;
+
+    // Si es abierta: NO la metas a climaLaboral; guárdala en 'abiertas'
+    if (meta.esAbierta) {
+      const texto = String(valor ?? '').trim();
+      if (texto !== '') {
+        abiertas.push({
+          seccion: Number(meta.seccionNumero || 0),
+          idPregunta: meta.codigo,
+          pregunta: meta.texto,
+          valor: texto,
+          dimension: meta.dimension || '',
+          catalogo: meta.catalogo
+        });
+      }
+      return; // ← saltamos para no mezclarla con CLIMA numérico
+    }
+
+ // CLIMA (cerradas): si viene como texto, conviértelo a ordinal 1..N
+    if (meta.catalogo === 'CLIMA' && typeof valor === 'string' && Array.isArray(meta.escalaValores)) {
+      const idx = meta.escalaValores.findIndex(v => String(v) === String(valor));
+      if (idx >= 0) valor = idx + 1;
+    }
+
+    const itemBase = {
+      idPregunta: meta.codigo,
+      pregunta: meta.texto,
+      valor,
+      escala: (meta.catalogo === 'CLIMA') ? escalaClima(meta.seccionNumero) : escalaNom035(meta.seccionNumero),
+      dimension: meta.dimension || ''
+    };
+
+    const s = Number(meta.seccionNumero || 0);
+    if (meta.catalogo === 'CLIMA') {
+      if (s === 1) seccionI.push(itemBase);
+      else if (s === 2) seccionII.push(itemBase);
+      else if (s === 3) seccionIII.push(itemBase);
+      else seccionIV.push(itemBase);
+    } else {
+      if (s === 1)      guiaI.push(itemBase);
+      else if (s === 2) guiaII.push(itemBase);
+      else              guiaIII.push(itemBase);
+    }
+  });
+
+  // —— Guía V (demográficos) con pregunta + escala ——
+  const GV = [];
+  const m = form.metadata || {};
+  const GV_DEF = {
+    V1: { campo: 'sexo',         pregunta: 'Sexo',          escala: CAT_SEXO.join(',') },
+    V2: { campo: 'edad',         pregunta: 'Edad',          escala: CAT_EDAD.join(',') },
+    V3: { campo: 'estadoCivil',  pregunta: 'Estado Civil',  escala: CAT_ESTADO_CIVIL.join(',') },
+    V4: { campo: 'nivelEstudios',pregunta: 'Escolaridad',   escala: CAT_ESCOLARIDAD.join(',') },
+    V5: { campo: 'adscripcion',  pregunta: 'Adscripción',   escala: CAT_DEPARTAMENTO.join(',') },
+    V6: { campo: 'area',         pregunta: 'Área',          escala: CAT_AREA.join(',') },
+    V7: { campo: 'tipoContrato', pregunta: 'Tipo de contrato', escala: CAT_TIPO_CONTRATO.join(',') },
+    V8: { campo: 'tipoPuesto',   pregunta: 'Tipo de puesto',   escala: CAT_TIPO_PUESTO.join(',') },
+    V9: { campo: 'experiencia',  pregunta: 'Antigüedad',    escala: CAT_ANTIGUEDAD.join(',') },
+    V10:{ campo: 'jornada',      pregunta: 'Jornada',       escala: CAT_JORNADA.join(',') },
+  };
+  Object.entries(GV_DEF).forEach(([idPregunta, def]) => {
+    const valor = m[def.campo];
+    if (valor && String(valor).trim() !== '') {
+      GV.push({ idPregunta, pregunta: def.pregunta, valor, escala: def.escala, dimension: 'Demográficos' });
+    }
+  });
+
+  const respuestasObj = {};
+  if (guiaI.length)  respuestasObj.guiaI = guiaI;
+  if (guiaII.length) respuestasObj.guiaII = guiaII;
+  if (guiaIII.length)respuestasObj.guiaIII = guiaIII;
+
+  const climaLab = {};
+  if (seccionI.length) climaLab.seccionI = seccionI;
+  if (seccionII.length)climaLab.seccionII = seccionII;
+  if (seccionIII.length)climaLab.seccionIII = seccionIII;
+  if (seccionIV.length)climaLab.seccionIV = seccionIV;
+  if (Object.keys(climaLab).length) respuestasObj.climaLaboral = climaLab;
+
+  if (GV.length) respuestasObj.guiaV = GV;
+  if (abiertas.length) respuestasObj[OPEN_KEY] = abiertas;
+
+  return {
+    cuestionarioId,
+    participanteCodigo,
+    respuestas: [ respuestasObj ]
+  };
+};
+
 
   // ================== UI: Paso 1 ==================
   const Step1 = () => (
@@ -486,7 +589,7 @@ export default function CapturaRespuestas() {
         const respondidas = cerradas.filter(rid => respuestas[rid]?.valor !== undefined && respuestas[rid]?.valor !== '');
         if (cerradas.length !== respondidas.length) { setError('Responde todas las preguntas cerradas.'); return; }
 
-        const payload = buildAnswersPayload();
+        const payload = buildPayloadForCapturar();
 
         // Intentos de guardado
         const bases = [API_BASE, 'http://localhost:3001'];
@@ -524,7 +627,8 @@ export default function CapturaRespuestas() {
         }
 
         setSuccess('Respuestas guardadas correctamente');
-        setTimeout(() => navigate('/captura/generar'), 1000);
+        // redirige al Home (ajusta si tu home es otro path: '/dashboard', '/inicio', etc.)
+        setTimeout(() => navigate('/'), 1200);
       } catch (e) { setError(e.message); }
     };
 
@@ -569,8 +673,8 @@ export default function CapturaRespuestas() {
 
                       {r.esAbierta ? (
                         <textarea
-                          rows={2}
-                          className="reactivo-textarea-disabled"
+                          rows={3}
+                          className="reactivo-textarea"
                           placeholder="Respuesta abierta"
                           value={current}
                           onChange={(e) => setResp(rid, e.target.value)}

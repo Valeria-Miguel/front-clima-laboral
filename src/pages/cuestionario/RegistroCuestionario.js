@@ -130,12 +130,22 @@ export default function RegistroCuestionario() {
       setCuestionarioId(id);
 
       // 2) Generar 1 SOLO código
-      const resp2 = await fetch(`${ApiConfig.baseURL}/participantes/generar`, {
+      const resp2 = await fetch(`${ApiConfig.baseURL}/api/participantes/generar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cuestionarioId: id, cantidad: 1 })
       });
-      const data2 = await resp2.json();
+
+      // Blindaje: si no es JSON, léelo como texto para no tronar con <!DOCTYPE...>
+      const ct2 = resp2.headers.get('content-type') || '';
+        let data2;
+        if (ct2.includes('application/json')) {
+          data2 = await resp2.json();
+        } else {
+          const raw = await resp2.text();
+          throw new Error(`Participantes respondió ${resp2.status}. Detalle: ${raw.slice(0,120)}…`);
+        }
+
       if (!resp2.ok) throw new Error(data2?.message || 'No se pudo generar el código');
 
       const lista = data2?.codigos || data2?.codigosGenerados || [];
